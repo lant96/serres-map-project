@@ -11,23 +11,33 @@ export async function getHotspots() {
   const records = data.records ?? [];
 
   const hotspots = records.map((item) => {
-    // 👇 Grab the nested fields object, or an empty object if it's missing
     const f = item.fields || {};
 
     return {
-      id: item.id, // ID usually sits on the outer object in v3
+      id: item.Id ?? item.id ?? index,
       
-      // Look inside the 'f' (fields) object for your data!
+      // core metadata
       title: f.title ?? f.Title ?? f.Name ?? "Unnamed Hotspot",
       type: f.type ?? f.Type ?? "unknown",
+      status: f.status ?? "unknown",
       
+      // spatial data
       lat: safeNumber(f.lat ?? f.Lat),
       lng: safeNumber(f.lng ?? f.Lng),
+
+      // relational fields (future-proofing)
+      buildingId: f.building_id ?? null,
+      imageId: f.image_id ?? null,
+      publicationId: f.publication_id ?? null,
+
+      // optional flags
+      isActive: f.is_active ?? true,
     };
   });
 
   console.log("SUCCESSFULLY EXTRACTED HOTSPOTS:", hotspots);
 
-  // Filter out any hotspots that don't have valid coordinates
-  return hotspots.filter(h => Number.isFinite(h.lat) && Number.isFinite(h.lng));
+  return hotspots.filter(
+    h => Number.isFinite(h.lat) && Number.isFinite(h.lng)
+  );
 }
