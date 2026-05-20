@@ -1,20 +1,48 @@
 export default function HotspotOverlay({ hotspot, onClose }) {
+  if (!hotspot) return null;
+
   return (
-    <div style={{
-      position: "absolute",
-      inset: 0,
-      background: "#fff",
-      zIndex: 10
-    }}>
-      <button onClick={onClose} style={{ margin: 16 }}>
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: "white",
+        zIndex: 10,
+        padding: 20,
+        overflowY: "auto",
+      }}
+    >
+      <button
+        onClick={onClose}
+        style={{
+          marginBottom: 20,
+          cursor: "pointer",
+        }}
+      >
         Close
       </button>
 
-      <div style={{ padding: 16 }}>
-        <h2>{hotspot.name}</h2>
+      <h2>{hotspot.title}</h2>
 
-        <p><strong>Type:</strong> {hotspot.type}</p>
+      <div style={{ marginBottom: 10 }}>
+        Type: {hotspot.type}
       </div>
+
+      <div style={{ marginBottom: 10 }}>
+        Status: {hotspot.status}
+      </div>
+
+      {hotspot.gis_id && (
+        <div style={{ marginBottom: 10 }}>
+          GIS ID: {hotspot.gis_id}
+        </div>
+      )}
+
+      {hotspot.object_name && (
+        <div>
+          Object: {hotspot.object_name}
+        </div>
+      )}
     </div>
   );
 }

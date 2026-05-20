@@ -6,10 +6,18 @@ export default function HotspotList() {
   const setSelectedHotspotId = useAppStore((s) => s.setSelectedHotspotId);
 
   // Filter the list based on the global state
+  const normalizeFilter = (f) => {
+    if (f === "buildings") return "building";
+    if (f === "images") return "image";
+    if (f === "publications") return "publication";
+    return f;
+  };
+
   const filtered =
     activeFilter === "all"
       ? hotspots
-      : hotspots.filter((h) => h.type === activeFilter);
+      : hotspots.filter((h) => h.type === normalizeFilter(activeFilter)
+    );
 
   return (
     <div style={{ overflowY: "auto", flex: 1 }}>

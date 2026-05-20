@@ -15,6 +15,7 @@ export default function MapView() {
   const hotspots = useAppStore((s) => s.hotspots);
   const activeFilter = useAppStore((s) => s.activeFilter);
   const setSelectedHotspotId = useAppStore((s) => s.setSelectedHotspotId);
+  const selectedBuildingId = useRef(null);const selectedBuildingIdRef = useRef(null);
 
   // =========================
   // INIT MAP
@@ -54,6 +55,7 @@ export default function MapView() {
       map.current.addSource("buildings", {
         type: "geojson",
         data: "/data/buildings-merarhias_02.geojson",
+        promoteId: "gis_id"
       });
 
       map.current.addLayer({
@@ -62,7 +64,12 @@ export default function MapView() {
         source: "buildings",
         paint: {
           "fill-color": "#ff0000",
-          "fill-opacity": 0.3,
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            0.6,
+            0.3
+          ],
         },
       });
 
@@ -74,9 +81,38 @@ export default function MapView() {
         if (!feature) return;
 
         const gisId = feature.properties?.gis_id;
-
         console.log("Clicked GIS ID:", gisId);
 
+        const matchedHotspot = hotspots.find(
+          (h) => h.gis_id === gisId
+        );
+
+        if (!matchedHotspot) {
+          console.warn("No hotspot linked to this building GIS ID");
+          return;
+        }
+
+        // =========================
+        // RESET previous selection
+        // =========================
+        if (selectedBuildingIdRef.current !== null) {
+          map.current.setFeatureState(
+            { source: "buildings", id: selectedBuildingIdRef.current },
+            { selected: false }
+          );
+        }
+
+        // =========================
+        // SET new selection
+        // =========================
+        selectedBuildingIdRef.current = feature.id;
+
+        map.current.setFeatureState(
+          { source: "buildings", id: feature.id },
+          { selected: true }
+        );
+
+        setSelectedHotspotId(matchedHotspot.id);
       });
 
       map.current.on("mouseenter", "buildings-outline", () => {
@@ -131,26 +167,54 @@ export default function MapView() {
         : hotspots.filter((h) => h.type === activeFilter);
 
     filtered.forEach((hotspot) => {
-      const el = document.createElement("div");
 
-      el.style.width = "18px";
-      el.style.height = "18px";
-      el.style.backgroundColor = "#aa3bff";
-      el.style.border = "2px solid white";
-      el.style.borderRadius = "50%";
-      el.style.cursor = "pointer";
-      el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+  // =========================
+  // BUILDINGS = NO DOT MARKER
+  // =========================
+  if (hotspot.type === "building") {
+    return;
+  }
 
-      el.addEventListener("click", () => {
-        setSelectedHotspotId(hotspot.id);
-      });
+  // skip invalid coordinates
+  if (
+    typeof hotspot.lng !== "number" ||
+    typeof hotspot.lat !== "number" ||
+    Number.isNaN(hotspot.lng) ||
+    Number.isNaN(hotspot.lat)
+  ) {
+    return;
+  }
 
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([hotspot.lng, hotspot.lat])
-        .addTo(map.current);
+  const el = document.createElement("div");
 
-      markersRef.current.push(marker);
-    });
+  // =========================
+  // COLOR BY TYPE
+  // =========================
+  if (hotspot.type === "image") {
+    el.style.backgroundColor = "#ff4d4d"; 
+  } else if (hotspot.type === "publication") {
+    el.style.backgroundColor = "#888888";
+  } else {
+    el.style.backgroundColor = "#aa3bff";
+  }
+
+  el.style.width = "18px";
+  el.style.height = "18px";
+  el.style.border = "2px solid white";
+  el.style.borderRadius = "50%";
+  el.style.cursor = "pointer";
+  el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+
+  el.addEventListener("click", () => {
+    setSelectedHotspotId(hotspot.id);
+  });
+
+  const marker = new mapboxgl.Marker(el)
+    .setLngLat([hotspot.lng, hotspot.lat])
+    .addTo(map.current);
+
+  markersRef.current.push(marker);
+});
   }, [hotspots, activeFilter]);
 
   // =========================
