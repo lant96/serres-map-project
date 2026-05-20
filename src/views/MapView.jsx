@@ -49,25 +49,48 @@ export default function MapView() {
       });
 
       // =========================
-      // 2. BUILDINGS (outline)
+      // 2. BUILDINGS (fill)
       // =========================
       map.current.addSource("buildings", {
         type: "geojson",
-        data: "/data/buildings-merarhias.geojson",
+        data: "/data/buildings-merarhias_02.geojson",
       });
 
       map.current.addLayer({
         id: "buildings-outline",
-        type: "line",
+        type: "fill",
         source: "buildings",
         paint: {
-          "line-color": "#000",
-          "line-width": 1,
+          "fill-color": "#ff0000",
+          "fill-opacity": 0.3,
         },
       });
 
       // =========================
-      // 3. OTTOMAN MARKET (outline)
+      // BUILDING CLICK HANDLER
+      // =========================
+      map.current.on("click", "buildings-outline", (e) => {
+        const feature = e.features?.[0];
+        if (!feature) return;
+
+        const gisId = feature.properties?.gis_id;
+
+        console.log("Clicked GIS ID:", gisId);
+
+      });
+
+      map.current.on("mouseenter", "buildings-outline", () => {
+        map.current.getCanvas().style.cursor = "pointer";
+      });
+
+      map.current.on("mouseleave", "buildings-outline", () => {
+        map.current.getCanvas().style.cursor = "";
+      });
+
+
+
+      // =========================
+      // 3. OTTOMAN MARKET
       // =========================
       map.current.addSource("market", {
         type: "geojson",
@@ -148,11 +171,7 @@ export default function MapView() {
   // =========================
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
-      <div
-        ref={mapContainer}
-        style={{ width: "100%", height: "100%" }}
-      />
-
+      <div ref={mapContainer} style={{ width: "100%", height: "100%" }}/>
       <MapControls toggleLayer={toggleLayer} />
     </div>
   );
