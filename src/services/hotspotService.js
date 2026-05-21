@@ -1,4 +1,4 @@
-import { nocodbClient } from "../api/nocodbClient";
+import { nocodbClient } from "./api/nocodbClient";
 
 function safeNumber(v) {
   if (typeof v === "number") return v;

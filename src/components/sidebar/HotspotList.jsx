@@ -1,23 +1,14 @@
-import { useAppStore } from '../store/useAppStore' // Adjust path if needed
+import { useAppStore } from "../../state/useAppStore";
 
 export default function HotspotList() {
   const hotspots = useAppStore((s) => s.hotspots);
   const activeFilter = useAppStore((s) => s.activeFilter);
   const setSelectedHotspotId = useAppStore((s) => s.setSelectedHotspotId);
 
-  // Filter the list based on the global state
-  const normalizeFilter = (f) => {
-    if (f === "buildings") return "building";
-    if (f === "images") return "image";
-    if (f === "publications") return "publication";
-    return f;
-  };
-
   const filtered =
     activeFilter === "all"
       ? hotspots
-      : hotspots.filter((h) => h.type === normalizeFilter(activeFilter)
-    );
+      : hotspots.filter((h) => h.type === activeFilter);
 
   return (
     <div style={{ overflowY: "auto", flex: 1 }}>
@@ -31,11 +22,9 @@ export default function HotspotList() {
             cursor: "pointer",
           }}
         >
-          <div style={{ fontWeight: "bold" }}>
-            {h.title}
-          </div>
+          <div style={{ fontWeight: "bold" }}>{h.title}</div>
 
-          <div style={{ fontSize: 12, opacity: 0.6, textTransform: 'capitalize' }}>
+          <div style={{ fontSize: 12, opacity: 0.6 }}>
             {h.type}
           </div>
         </div>

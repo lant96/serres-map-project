@@ -1,7 +1,7 @@
-import { nocodbClient } from "../api/nocodbClient";
+import { nocodbClient } from "./api/nocodbClient";
 
 export async function getBuildings() {
-  const data = await nocodbClient.getHotspots(); // temporary reuse pattern
+  const data = await nocodbClient.getHotspots();
 
   const records = data.records ?? data.list ?? [];
 

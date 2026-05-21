@@ -1,8 +1,10 @@
 import { useEffect } from "react";
-import { useAppStore } from "./store/useAppStore";
-import MapView from "./views/MapView";
-import Sidebar from "./components/Sidebar";
-import { getBuildings } from "./services/buildingService";
+
+import { useAppStore } from "../state/useAppStore";
+import MapView from "../views/MapView/MapView";
+import Sidebar from "../components/sidebar/Sidebar";
+
+import { getBuildings } from "../services/buildingService";
 
 export default function App() {
   const fetchHotspots = useAppStore((s) => s.fetchHotspots);
@@ -17,11 +19,19 @@ export default function App() {
     }
 
     loadBuildings();
-  }, []); 
-  
+  }, []);
+
   return (
-    <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        width: "100vw",
+        overflow: "hidden",
+      }}
+    >
       <Sidebar />
+
       <div style={{ flex: 1, position: "relative" }}>
         <MapView />
       </div>
