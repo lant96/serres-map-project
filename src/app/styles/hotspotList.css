@@ -1,0 +1,32 @@
+.hotspot-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.hotspot-item {
+  padding: 14px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.hotspot-item:hover {
+  background: #f3f4f6;
+}
+
+.hotspot-item:active {
+  transform: scale(0.99);
+}
+
+.hotspot-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.hotspot-type {
+  font-size: 12px;
+  opacity: 0.6;
+  text-transform: capitalize;
+  margin-top: 4px;
+}

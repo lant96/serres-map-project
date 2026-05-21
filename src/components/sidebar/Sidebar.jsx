@@ -4,10 +4,10 @@ import FilterBar from "./FilterBar";
 import HotspotList from "./HotspotList";
 import HotspotOverlay from "./HotspotOverlay";
 
+import "../../app/styles/sidebar.css";
+
 export default function Sidebar() {
-  const hotspots = useAppStore((s) => s.hotspots);
   const selectedHotspotId = useAppStore((s) => s.selectedHotspotId);
-  const setSelectedHotspotId = useAppStore((s) => s.setSelectedHotspotId);
 
   const selectedHotspotObj = useAppStore((s) =>
     s.hotspots.find(
@@ -16,26 +16,19 @@ export default function Sidebar() {
   );
 
   return (
-    <div
-      style={{
-        width: "25%",
-        minWidth: "300px",
-        height: "100%",
-        background: "#ffffff",
-        borderRight: "1px solid #ddd",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 5,
-      }}
-    >
-      <FilterBar />
-      <HotspotList />
+    <div className="sidebar">
+      <div className="sidebar-section">
+        <FilterBar />
+      </div>
+
+      <div className="sidebar-scroll">
+        <HotspotList />
+      </div>
 
       {selectedHotspotObj && (
         <HotspotOverlay
           hotspot={selectedHotspotObj}
-          onClose={() => setSelectedHotspotId(null)}
+          onClose={() => useAppStore.getState().setSelection("clear")}
         />
       )}
     </div>

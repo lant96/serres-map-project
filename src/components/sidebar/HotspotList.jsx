@@ -1,4 +1,5 @@
 import { useAppStore } from "../../state/useAppStore";
+import "../../app/styles/hotspotList.css";
 
 export default function HotspotList() {
   const hotspots = useAppStore((s) => s.hotspots);
@@ -11,22 +12,16 @@ export default function HotspotList() {
       : hotspots.filter((h) => h.type === activeFilter);
 
   return (
-    <div style={{ overflowY: "auto", flex: 1 }}>
+    <div className="hotspot-list">
       {filtered.map((h) => (
         <div
           key={h.id}
+          className="hotspot-item"
           onClick={() => setSelectedHotspotId(h.id)}
-          style={{
-            padding: 14,
-            borderBottom: "1px solid #eee",
-            cursor: "pointer",
-          }}
         >
-          <div style={{ fontWeight: "bold" }}>{h.title}</div>
+          <div className="hotspot-title">{h.title}</div>
 
-          <div style={{ fontSize: 12, opacity: 0.6 }}>
-            {h.type}
-          </div>
+          <div className="hotspot-type">{h.type}</div>
         </div>
       ))}
     </div>

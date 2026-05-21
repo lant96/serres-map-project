@@ -3,8 +3,6 @@ import mapboxgl from "mapbox-gl";
 
 import { useAppStore } from "../../state/useAppStore";
 
-import MapControls from "../../components/controls/MapControls";
-
 import { createMapInteractions } from "./mapInteractions";
 import { createMapMarkers } from "./mapMarkers";
 import { createMapBuildings } from "./mapBuildings";
@@ -163,7 +161,6 @@ export default function MapView() {
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
       <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
-      <MapControls />
     </div>
   );
 }
