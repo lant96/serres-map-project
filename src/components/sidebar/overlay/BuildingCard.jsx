@@ -1,9 +1,13 @@
-export default function BuildingCard({ building }) {
-  // 2d_plan is normalised to [{url, ...}] by buildingService
-  const planUrl = building["2d_plan"]?.[0]?.url ?? null;
+import { useState } from "react";
 
-  // building.images is resolved by deep hydration in hotspotHydrationService —
-  // each item is a full image entity with image_file: [{url}]
+export default function BuildingCard({
+  building,
+  onImageHover,
+  onImageHoverEnd,
+}) {
+  const [lightboxUrl, setLightboxUrl] = useState(null);
+
+  const planUrl       = building["2d_plan"]?.[0]?.url ?? null;
   const relatedImages = building.images ?? [];
 
   return (
@@ -22,7 +26,7 @@ export default function BuildingCard({ building }) {
         <p style={styles.description}>{building.description}</p>
       )}
 
-      {/* Related images — photo gallery */}
+      {/* Related images — clickable gallery */}
       {relatedImages.length > 0 && (
         <div>
           <h4 style={styles.sectionLabel}>Related images</h4>
@@ -35,12 +39,33 @@ export default function BuildingCard({ building }) {
                   key={img.Id ?? img.id ?? img.title}
                   src={imgUrl}
                   alt={img.title ?? ""}
-                  style={styles.galleryThumb}
                   title={img.title ?? ""}
+                  style={styles.galleryThumb}
+                  onClick={() => setLightboxUrl(imgUrl)}
+                  onMouseEnter={() => onImageHover?.(img)}
+                  onMouseLeave={() => onImageHoverEnd?.()}
                 />
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxUrl && (
+        <div style={styles.lightboxBackdrop} onClick={() => setLightboxUrl(null)}>
+          <button
+            style={styles.lightboxClose}
+            onClick={() => setLightboxUrl(null)}
+            aria-label="Close"
+          >
+            ×
+          </button>
+          <img
+            src={lightboxUrl}
+            style={styles.lightboxImage}
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
@@ -79,5 +104,38 @@ const styles = {
     objectFit: "cover",
     borderRadius: 4,
     display: "block",
+    cursor: "pointer",
+    transition: "opacity 0.15s ease",
+  },
+
+  lightboxBackdrop: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.85)",
+    zIndex: 99999,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "zoom-out",
+  },
+  lightboxImage: {
+    maxWidth: "90vw",
+    maxHeight: "90vh",
+    objectFit: "contain",
+    borderRadius: 6,
+    cursor: "default",
+    boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+  },
+  lightboxClose: {
+    position: "absolute",
+    top: 20,
+    right: 24,
+    background: "transparent",
+    border: "none",
+    color: "#fff",
+    fontSize: 36,
+    cursor: "pointer",
+    lineHeight: 1,
+    padding: 0,
   },
 };

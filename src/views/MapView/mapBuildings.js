@@ -1,56 +1,57 @@
 export function createMapBuildings({ map }) {
 
-  function updateBuildingHighlight(activeGisId, relatedGisIds = []) {
+  // Internal state — recomputed into one Mapbox expression on every change
+  let _activeGisId   = "";
+  let _relatedGisIds = [];
+  let _hoveredGisId  = "";
+
+  // ── expression builder ───────────────────────────────────────────────────
+  //
+  // Opacity levels:
+  //   selected  0.65   the clicked building polygon
+  //   hovered   0.55   cursor over a related building name in a card
+  //   related   0.45   auto-highlighted relations of the selected hotspot
+  //   dimmed    0.05   everything else when something is active
+  //   default   0.30   nothing selected
+
+  function _applyHighlight() {
     if (!map?.getLayer("buildings-layer")) return;
 
-    const hasSelection =
-      !!activeGisId || relatedGisIds.length > 0;
+    const hasActivity =
+      !!_activeGisId || _relatedGisIds.length > 0 || !!_hoveredGisId;
+    const dimmed = hasActivity ? 0.05 : 0.3;
 
-    const dimmedOpacity = hasSelection ? 0.08 : 0.3;
+    const conditions = [];
 
-    let expression;
-
-    // ── nothing selected ─────────────────────────────
-    if (!hasSelection) {
-      expression = 0.3;
+    if (_activeGisId) {
+      conditions.push(["==", ["get", "gis_id"], _activeGisId], 0.65);
+    }
+    if (_hoveredGisId && _hoveredGisId !== _activeGisId) {
+      conditions.push(["==", ["get", "gis_id"], _hoveredGisId], 0.55);
+    }
+    if (_relatedGisIds.length > 0) {
+      conditions.push(
+        ["in", ["get", "gis_id"], ["literal", _relatedGisIds]],
+        0.45
+      );
     }
 
-    // ── selected only ────────────────────────────────
-    else if (relatedGisIds.length === 0) {
-      expression = [
-        "case",
-        ["==", ["get", "gis_id"], activeGisId],
-        0.75,
-        dimmedOpacity,
-      ];
-    }
+    const opacity =
+      conditions.length > 0 ? ["case", ...conditions, dimmed] : dimmed;
 
-    // ── selected + related ───────────────────────────
-    else {
-      expression = [
-        "case",
-
-        // selected building
-        ["==", ["get", "gis_id"], activeGisId],
-        0.75,
-
-        // related buildings
-        ["in", ["get", "gis_id"], ["literal", relatedGisIds]],
-        0.45,
-
-        // everything else
-        dimmedOpacity,
-      ];
-    }
-
-    map.setPaintProperty(
-      "buildings-layer",
-      "fill-opacity",
-      expression
-    );
+    map.setPaintProperty("buildings-layer", "fill-opacity", opacity);
   }
 
-  return {
-    updateBuildingHighlight,
-  };
+  function updateBuildingHighlight(activeGisId, relatedGisIds = []) {
+    _activeGisId   = activeGisId;
+    _relatedGisIds = relatedGisIds;
+    _applyHighlight();
+  }
+
+  function updateHoveredBuilding(hoveredGisId = "") {
+    _hoveredGisId = hoveredGisId;
+    _applyHighlight();
+  }
+
+  return { updateBuildingHighlight, updateHoveredBuilding };
 }

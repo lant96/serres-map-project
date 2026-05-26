@@ -16,25 +16,21 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 export default function MapView() {
   const mapContainer = useRef(null);
   const map          = useRef(null);
-
   const markersRef   = useRef({});
   const hotspotsRef  = useRef([]);
+  const markers      = useRef(null);
+  const buildings    = useRef(null);
 
-  const markers   = useRef(null);
-  const buildings = useRef(null);
+  const hotspots               = useAppStore((s) => s.hotspots);
+  const activeFilter           = useAppStore((s) => s.activeFilter);
+  const selectedBuildingId     = useAppStore((s) => s.selectedBuildingId);
+  const selectedHotspotId      = useAppStore((s) => s.selectedHotspotId);
+  const hoveredRelatedHotspotId = useAppStore((s) => s.hoveredRelatedHotspotId);
+  const setSelection           = useAppStore((s) => s.setSelection);
 
-  const hotspots          = useAppStore((s) => s.hotspots);
-  const activeFilter      = useAppStore((s) => s.activeFilter);
-  const selectedBuildingId = useAppStore((s) => s.selectedBuildingId);
-  const selectedHotspotId  = useAppStore((s) => s.selectedHotspotId);
-  const setSelection       = useAppStore((s) => s.setSelection);
+  useEffect(() => { hotspotsRef.current = hotspots; }, [hotspots]);
 
-  // Keep a live ref so interaction callbacks always see fresh hotspot data
-  useEffect(() => {
-    hotspotsRef.current = hotspots;
-  }, [hotspots]);
-
-  // ── MAP INITIALISATION ────────────────────────────────────────────────────
+  // MAP INITIALISATION 
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
 
@@ -46,7 +42,6 @@ export default function MapView() {
     });
 
     map.current.on("load", () => {
-      // Serres urban context blocks
       map.current.addSource("serres-blocks", {
         type: "geojson",
         data: "/data/serres-blocks.geojson",
@@ -58,7 +53,6 @@ export default function MapView() {
         paint: { "fill-color": "#c4a484", "fill-opacity": 0.25 },
       });
 
-      // Building footprints
       map.current.addSource("buildings", {
         type: "geojson",
         data: "/data/buildings-merarhias_02.geojson",
@@ -70,7 +64,6 @@ export default function MapView() {
         paint: { "fill-color": "#ff0000", "fill-opacity": 0.3 },
       });
 
-      // Ottoman market outline
       map.current.addSource("market", {
         type: "geojson",
         data: "/data/ottoman-market.geojson",
@@ -82,28 +75,17 @@ export default function MapView() {
         paint: { "line-color": "#3a3a3a", "line-width": 0.5 },
       });
 
-      // ── INTERACTIONS ────────────────────────────────────────────────────
       const interactions = createMapInteractions({
         map: map.current,
         hotspotsRef,
         setSelection,
       });
-
       map.current.on("click", "buildings-layer", interactions.onBuildingClick);
       map.current.on("click",                    interactions.onMapClick);
       map.current.on("mouseenter", "buildings-layer", interactions.onMouseEnter);
       map.current.on("mouseleave", "buildings-layer", interactions.onMouseLeave);
 
-      // ── MARKERS ─────────────────────────────────────────────────────────
-      markers.current = createMapMarkers({
-        map: map.current,
-        markersRef,
-        setSelection,
-      });
-
-      // ── BUILDINGS ───────────────────────────────────────────────────────
-      // FIX: no longer pass `hotspots` at creation time (would be stale []).
-      // mapBuildings now only needs the map reference.
+      markers.current   = createMapMarkers({ map: map.current, markersRef, setSelection });
       buildings.current = createMapBuildings({ map: map.current });
     });
 
@@ -114,16 +96,14 @@ export default function MapView() {
     };
   }, []);
 
-  // ── MARKERS REBUILD ───────────────────────────────────────────────────────
-  // Re-runs whenever hotspots load or the active filter changes
+  // MARKERS REBUILD 
   useEffect(() => {
     if (!markers.current) return;
     markers.current.buildMarkers(hotspots, activeFilter);
   }, [hotspots, activeFilter]);
 
-  // ── SELECTION HIGHLIGHT ───────────────────────────────────────────────────
-  // Shared helper — computes related IDs once and drives both markers and
-  // building polygons from the same data.
+  // SELECTION HIGHLIGHT 
+  // Computes related IDs once and drives both markers and building polygons.
   useEffect(() => {
     if (!markers.current || !buildings.current) return;
 
@@ -131,19 +111,13 @@ export default function MapView() {
       (h) => String(h.id) === String(selectedHotspotId)
     );
 
-    // IDs of hotspots that share an entity with the selected one
     const relatedIds = getRelatedHotspotIds(currentHotspot, hotspots);
 
-    // ── Markers ────────────────────────────────────────────────────────────
     markers.current.updateMarkerSelection(selectedHotspotId, relatedIds);
 
-    // ── Building polygons ──────────────────────────────────────────────────
-    // Active polygon: the selected hotspot's own gis_id, or a directly
-    // selected building (fallback from mapInteractions)
     const activeGisId =
       selectedBuildingId || currentHotspot?.gis_id || "";
 
-    // Related polygons: gis_ids of building-type hotspots in relatedIds
     const relatedGisIds = hotspots
       .filter((h) => h.type === "building" && relatedIds.has(String(h.id)))
       .map((h) => h.gis_id)
@@ -152,6 +126,31 @@ export default function MapView() {
     buildings.current.updateBuildingHighlight(activeGisId, relatedGisIds);
 
   }, [selectedHotspotId, selectedBuildingId, hotspots]);
+
+  // HOVER HIGHLIGHT 
+  // Fires when the user hovers over a related item in the overlay cards.
+  // Applies a temporary cyan highlight to the corresponding marker or polygon.
+  useEffect(() => {
+    if (!markers.current || !buildings.current) return;
+
+    if (!hoveredRelatedHotspotId) {
+      markers.current.updateHoveredMarker(null);
+      buildings.current.updateHoveredBuilding("");
+      return;
+    }
+
+    const hoveredHotspot = hotspots.find(
+      (h) => String(h.id) === String(hoveredRelatedHotspotId)
+    );
+
+    // Marker highlight (image / publication hotspots)
+    markers.current.updateHoveredMarker(hoveredRelatedHotspotId);
+
+    // Polygon highlight (building hotspots)
+    const hoveredGisId = hoveredHotspot?.gis_id ?? "";
+    buildings.current.updateHoveredBuilding(hoveredGisId);
+
+  }, [hoveredRelatedHotspotId, hotspots]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>

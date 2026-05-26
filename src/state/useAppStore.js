@@ -4,12 +4,12 @@ import { hydrateHotspots } from "../services/hotspotHydrationService";
 
 export const useAppStore = create((set, get) => ({
 
-  // ── STATE ────────────────────────────────────────────────────────────────
+  // STATE 
 
   hotspots:     [],
   buildings:    [],
   images:       [],
-  publications: [],   // FIX: was missing — hydration always received []
+  publications: [],
 
   isLoading: false,
   error:     null,
@@ -17,31 +17,24 @@ export const useAppStore = create((set, get) => ({
   selectedHotspotId:  null,
   selectedBuildingId: null,
 
+  // ID of a related hotspot being hovered in the overlay cards.
+  // Drives the temporary highlight on map markers / building polygons.
+  hoveredRelatedHotspotId: null,
+
   activeFilter: "all",
 
-  // ── DATA LOADING ─────────────────────────────────────────────────────────
+  // DATA LOADING 
 
   fetchHotspots: async () => {
     set({ isLoading: true, error: null });
 
     try {
       const raw = await getHotspots();
-
       const { buildings, images, publications } = get();
 
-      const hydrated = hydrateHotspots({
-        hotspots: raw,
-        buildings,
-        images,
-        publications,
-      });
+      const hydrated = hydrateHotspots({ hotspots: raw, buildings, images, publications });
 
       console.log("HYDRATED HOTSPOTS:", hydrated);
-      console.log(
-        "FIRST HYDRATED HOTSPOT:",
-        hydrated[0]
-      );
-
       set({ hotspots: hydrated, isLoading: false });
 
     } catch (err) {
@@ -51,30 +44,29 @@ export const useAppStore = create((set, get) => ({
 
   setBuildings:    (data) => set({ buildings:    data }),
   setImages:       (data) => set({ images:       data }),
-  setPublications: (data) => set({ publications: data }),   // FIX: was missing
+  setPublications: (data) => set({ publications: data }),
 
-  // ── SELECTION ─────────────────────────────────────────────────────────────
+  // SELECTION 
 
   setSelectedHotspotId:  (id) => set({ selectedHotspotId: id }),
   setSelectedBuildingId: (id) => set({ selectedBuildingId: id }),
 
   setSelection: (type, id) =>
     set(() => {
-      if (type === "building") {
-        return { selectedBuildingId: id, selectedHotspotId: null };
-      }
-      if (type === "hotspot") {
-        return { selectedHotspotId: id, selectedBuildingId: null };
-      }
-      // "clear"
+      if (type === "building") return { selectedBuildingId: id, selectedHotspotId: null };
+      if (type === "hotspot")  return { selectedHotspotId: id, selectedBuildingId: null };
       return { selectedBuildingId: null, selectedHotspotId: null };
     }),
 
-  // ── FILTERS ───────────────────────────────────────────────────────────────
+  // Hover — set to a hotspot ID while the cursor is over a related card item,
+  // clear to null on mouse-leave.
+  setHoveredRelatedHotspotId: (id) => set({ hoveredRelatedHotspotId: id }),
+
+  // FILTERS 
 
   setActiveFilter: (filter) => set({ activeFilter: filter }),
 
-  // ── DERIVED SELECTORS ─────────────────────────────────────────────────────
+  // DERIVED SELECTORS
 
   getFilteredHotspots: () => {
     const { hotspots, activeFilter } = get();
@@ -88,8 +80,6 @@ export const useAppStore = create((set, get) => ({
     return hotspots.find((h) => String(h.id) === String(selectedHotspotId));
   },
 }));
-
-// ── INTERNAL HELPERS ────────────────────────────────────────────────────────
 
 function _normalizeFilter(f) {
   if (f === "buildings")    return "building";

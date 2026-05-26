@@ -1,14 +1,50 @@
+import { useAppStore } from "../../../state/useAppStore";
 import HotspotHeader from "./HotspotHeader";
 import BuildingCard from "./BuildingCard";
 import ImageCard from "./ImageCard";
 
 export default function HotspotOverlay({ hotspot, onClose }) {
+  const hotspots                  = useAppStore((s) => s.hotspots);
+  const setHoveredRelatedHotspotId = useAppStore((s) => s.setHoveredRelatedHotspotId);
+
   if (!hotspot) return null;
 
-  // Each hotspot type has a dedicated primary entity and a specific
-  // set of related content — we dispatch to the right card directly.
   const buildingEntity = hotspot.buildings?.[0] ?? null;
   const imageEntity    = hotspot.images?.[0]    ?? null;
+
+  function findHotspotForImage(img) {
+    const targetId = String(img.Id ?? img.id);
+    return hotspots.find(
+      (h) =>
+        h.type === "image" &&
+        (h.images ?? []).some((i) => String(i.Id ?? i.id) === targetId)
+    );
+  }
+
+  function findHotspotForBuilding(b) {
+    const targetId = String(b.Id ?? b.id);
+    return hotspots.find(
+      (h) =>
+        h.type === "building" &&
+        (h.buildings ?? []).some((bld) => String(bld.Id ?? bld.id) === targetId)
+    );
+  }
+
+  // Hover handlers
+
+  function onImageHover(img) {
+    const h = findHotspotForImage(img);
+    if (h) setHoveredRelatedHotspotId(String(h.id));
+  }
+
+  function onBuildingHover(b) {
+    const h = findHotspotForBuilding(b);
+    if (h) setHoveredRelatedHotspotId(String(h.id));
+  }
+
+  function onHoverEnd() {
+    setHoveredRelatedHotspotId(null);
+  }
 
   return (
     <div style={styles.overlay}>
@@ -16,11 +52,19 @@ export default function HotspotOverlay({ hotspot, onClose }) {
 
       <div style={styles.content}>
         {hotspot.type === "building" && buildingEntity && (
-          <BuildingCard building={buildingEntity} />
+          <BuildingCard
+            building={buildingEntity}
+            onImageHover={onImageHover}
+            onImageHoverEnd={onHoverEnd}
+          />
         )}
 
         {hotspot.type === "image" && imageEntity && (
-          <ImageCard image={imageEntity} />
+          <ImageCard
+            image={imageEntity}
+            onBuildingHover={onBuildingHover}
+            onBuildingHoverEnd={onHoverEnd}
+          />
         )}
       </div>
     </div>

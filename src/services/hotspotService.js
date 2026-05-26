@@ -12,8 +12,6 @@ function safeNumber(v) {
 //   - a single object:      { Id: 1, title: "Eski Cami" }
 //   - a plain string:       "Eski Cami"
 //   - null / undefined
-//
-// We always normalise to an array so the hydration layer sees consistent input.
 function normalizeToArray(val) {
   if (!val) return [];
   if (Array.isArray(val)) return val;
@@ -23,9 +21,6 @@ function normalizeToArray(val) {
 export async function getHotspots() {
   const data = await nocodbClient.getHotspots();
   const records = data.records ?? data.list ?? [];
-
-  // ── Uncomment this log if relations still appear empty after this fix ──
-  // console.log("RAW HOTSPOT FIELDS:", JSON.stringify(records[0], null, 2));
 
   const hotspots = records.map((item, index) => {
     const f = item.fields ?? item;
@@ -40,11 +35,6 @@ export async function getHotspots() {
       gis_id: f.gis_id ?? null,
       isActive: f.is_active ?? true,
 
-      // ── Raw linked-record arrays ────────────────────────────────────────
-      // Stored under *Ids names so they are clearly "pre-hydration" data.
-      // hotspotHydrationService reads these same names.
-      // Field names (building_id / image_id / publication_id) come from
-      // the NocoDB column names visible in your hotspots CSV export header.
       buildingIds:    normalizeToArray(f.building_id),
       imageIds:       normalizeToArray(f.image_id),
       publicationIds: normalizeToArray(f.publication_id),

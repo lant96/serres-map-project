@@ -7,14 +7,9 @@ const URLS = {
   publications: import.meta.env.VITE_NOCODB_PUBLICATIONS_URL,
 };
 
-// ─── helpers ────────────────────────────────────────────────────────────────
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
-/**
- * Fetch one NocoDB table with automatic retry on 429.
- * Retries up to MAX_RETRIES times, doubling the wait each attempt.
- */
 async function request(tableKey, { retries = 4, baseDelay = 800 } = {}) {
   const url = URLS[tableKey];
 
@@ -37,7 +32,6 @@ async function request(tableKey, { retries = 4, baseDelay = 800 } = {}) {
     }
 
     if (res.status === 429 && attempt < retries) {
-      // Respect Retry-After header if present, otherwise use exponential back-off
       const retryAfter = res.headers.get("Retry-After");
       const wait = retryAfter
         ? parseInt(retryAfter, 10) * 1000
@@ -60,18 +54,6 @@ async function request(tableKey, { retries = 4, baseDelay = 800 } = {}) {
   }
 }
 
-// ─── staggered batch helper ──────────────────────────────────────────────────
-
-/**
- * Run an array of async factories sequentially with a small gap between each.
- * This prevents all requests from landing simultaneously and triggering 429s.
- *
- * Usage:
- *   const [hotspots, buildings] = await staggered([
- *     () => nocodbClient.getHotspots(),
- *     () => nocodbClient.getBuildings(),
- *   ]);
- */
 export async function staggered(factories, gap = 300) {
   const results = [];
   for (const factory of factories) {
@@ -82,8 +64,6 @@ export async function staggered(factories, gap = 300) {
   }
   return results;
 }
-
-// ─── public client ───────────────────────────────────────────────────────────
 
 export const nocodbClient = {
   getHotspots:     () => request("hotspots"),

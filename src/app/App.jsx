@@ -33,7 +33,6 @@ export default function App() {
       setImages(imageData);
       setPublications(publicationData);
 
-      // Hydration reads from the store — must run after the three setters above
       await fetchHotspots();
     }
 

@@ -1,8 +1,9 @@
-export default function ImageCard({ image }) {
-  // image_file is normalised to [{url, ...}] by imageService
-  const imgUrl = image.image_file?.[0]?.url ?? null;
-
-  // image.buildings is resolved by deep hydration — full building objects
+export default function ImageCard({
+  image,
+  onBuildingHover,
+  onBuildingHoverEnd,
+}) {
+  const imgUrl          = image.image_file?.[0]?.url ?? null;
   const relatedBuildings = image.buildings ?? [];
 
   return (
@@ -17,22 +18,26 @@ export default function ImageCard({ image }) {
       )}
 
       {/* Year */}
-      {image.year && (
-        <p style={styles.year}>{image.year}</p>
-      )}
+      {image.year && <p style={styles.year}>{image.year}</p>}
 
       {/* Description */}
       {image.description && (
         <p style={styles.description}>{image.description}</p>
       )}
 
-      {/* Related buildings — simple text list */}
+      {/* Related buildings — text list, hoverable */}
       {relatedBuildings.length > 0 && (
         <div>
           <h4 style={styles.sectionLabel}>Related buildings</h4>
           <ul style={styles.list}>
             {relatedBuildings.map((b) => (
-              <li key={b.Id ?? b.id ?? b.title} style={styles.listItem}>
+              <li
+                key={b.Id ?? b.id ?? b.title}
+                style={styles.listItem}
+                // #2 — hover highlights the corresponding building polygon
+                onMouseEnter={() => onBuildingHover?.(b)}
+                onMouseLeave={() => onBuildingHoverEnd?.()}
+              >
                 {b.title}
               </li>
             ))}
@@ -77,7 +82,10 @@ const styles = {
   listItem: {
     fontSize: 13,
     color: "#333",
-    padding: "4px 0",
+    padding: "6px 8px",
     borderBottom: "1px solid #f0f0f0",
+    cursor: "default",
+    borderRadius: 4,
+    transition: "background 0.15s ease",
   },
 };

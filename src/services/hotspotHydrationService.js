@@ -38,12 +38,12 @@ export function hydrateHotspots({ hotspots, buildings, images, publications }) {
 
   return hotspots.map((hotspot) => {
 
-    // ── Level 1: resolve the hotspot's own direct links ──────────────────
+    // Level 1: resolve the hotspot's own direct links 
     const resolvedBuildings = resolveRelations(hotspot.buildingIds, buildings);
     const resolvedImages    = resolveRelations(hotspot.imageIds,    images);
     const resolvedPubs      = resolveRelations(hotspot.publicationIds, publications);
 
-    // ── Level 2: resolve each entity's own nested relations ──────────────
+    // ── Level 2: resolve each entity's own nested relations 
     // A building record in NocoDB has its own `images` and `publications`
     // columns linking to those tables. We resolve those too so the overlay
     // can render full image cards (with photo, year, description) rather
