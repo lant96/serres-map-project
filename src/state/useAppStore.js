@@ -1,119 +1,99 @@
 import { create } from "zustand";
 import { getHotspots } from "../services/hotspotService";
+import { hydrateHotspots } from "../services/hotspotHydrationService";
 
 export const useAppStore = create((set, get) => ({
 
-  // STATE
+  // ── STATE ────────────────────────────────────────────────────────────────
 
-  hotspots: [],
-  buildings: [],
+  hotspots:     [],
+  buildings:    [],
+  images:       [],
+  publications: [],   // FIX: was missing — hydration always received []
 
   isLoading: false,
-  error: null,
+  error:     null,
 
-  selectedHotspotId: null,
+  selectedHotspotId:  null,
   selectedBuildingId: null,
 
   activeFilter: "all",
 
-  // DATA LOADING
+  // ── DATA LOADING ─────────────────────────────────────────────────────────
 
   fetchHotspots: async () => {
-    set({
-      isLoading: true,
-      error: null,
-    });
+    set({ isLoading: true, error: null });
 
     try {
-      const data = await getHotspots();
-      console.log("FETCHED HOTSPOTS:", data);
+      const raw = await getHotspots();
 
-      set({
-        hotspots: data,
-        isLoading: false,
+      const { buildings, images, publications } = get();
+
+      const hydrated = hydrateHotspots({
+        hotspots: raw,
+        buildings,
+        images,
+        publications,
       });
+
+      console.log("HYDRATED HOTSPOTS:", hydrated);
+      console.log(
+        "FIRST HYDRATED HOTSPOT:",
+        hydrated[0]
+      );
+
+      set({ hotspots: hydrated, isLoading: false });
 
     } catch (err) {
-      set({
-        error: err.message,
-        isLoading: false,
-      });
+      set({ error: err.message, isLoading: false });
     }
   },
 
-  setBuildings: (data) =>
-    set({
-      buildings: data,
-    }),
+  setBuildings:    (data) => set({ buildings:    data }),
+  setImages:       (data) => set({ images:       data }),
+  setPublications: (data) => set({ publications: data }),   // FIX: was missing
 
-  // SELECTION
+  // ── SELECTION ─────────────────────────────────────────────────────────────
 
-  setSelectedHotspotId: (id) =>
-    set({
-      selectedHotspotId: id,
-    }),
-
-  setSelectedBuildingId: (id) =>
-    set({
-      selectedBuildingId: id,
-    }),
+  setSelectedHotspotId:  (id) => set({ selectedHotspotId: id }),
+  setSelectedBuildingId: (id) => set({ selectedBuildingId: id }),
 
   setSelection: (type, id) =>
     set(() => {
-
       if (type === "building") {
-        return {
-          selectedBuildingId: id,
-          selectedHotspotId: null,
-        };
+        return { selectedBuildingId: id, selectedHotspotId: null };
       }
-
       if (type === "hotspot") {
-        return {
-          selectedHotspotId: id,
-          selectedBuildingId: null,
-        };
+        return { selectedHotspotId: id, selectedBuildingId: null };
       }
-
-      return {
-        selectedBuildingId: null,
-        selectedHotspotId: null,
-      };
+      // "clear"
+      return { selectedBuildingId: null, selectedHotspotId: null };
     }),
 
-  // FILTERS
+  // ── FILTERS ───────────────────────────────────────────────────────────────
 
-  setActiveFilter: (filter) =>
-    set({
-      activeFilter: filter,
-    }),
+  setActiveFilter: (filter) => set({ activeFilter: filter }),
 
-  // DERIVED SELECTORS
+  // ── DERIVED SELECTORS ─────────────────────────────────────────────────────
 
   getFilteredHotspots: () => {
-    const state = get();
-
-    const normalizeFilter = (f) => {
-      if (f === "buildings") return "building";
-      if (f === "images") return "image";
-      if (f === "publications") return "publication";
-
-      return f;
-    };
-
-    return state.activeFilter === "all"
-      ? state.hotspots
-      : state.hotspots.filter(
-          (h) => h.type === normalizeFilter(state.activeFilter)
-        );
+    const { hotspots, activeFilter } = get();
+    return activeFilter === "all"
+      ? hotspots
+      : hotspots.filter((h) => h.type === _normalizeFilter(activeFilter));
   },
 
   getSelectedHotspot: () => {
-    const state = get();
-
-    return state.hotspots.find(
-      (h) =>
-        String(h.id) === String(state.selectedHotspotId)
-    );
+    const { hotspots, selectedHotspotId } = get();
+    return hotspots.find((h) => String(h.id) === String(selectedHotspotId));
   },
 }));
+
+// ── INTERNAL HELPERS ────────────────────────────────────────────────────────
+
+function _normalizeFilter(f) {
+  if (f === "buildings")    return "building";
+  if (f === "images")       return "image";
+  if (f === "publications") return "publication";
+  return f;
+}

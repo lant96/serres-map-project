@@ -1,17 +1,19 @@
 .hotspot-list {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .hotspot-item {
-  padding: 14px 14px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   cursor: pointer;
   transition: background 0.15s ease, transform 0.1s ease;
+  background: transparent;
 }
 
 .hotspot-item:hover {
-  background: #f3f4f6;
+  background: rgba(255,255,255,0.04);
 }
 
 .hotspot-item:active {
@@ -21,7 +23,7 @@
 .hotspot-title {
   font-weight: 600;
   font-size: 14px;
-  color: #111827;
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .hotspot-type {

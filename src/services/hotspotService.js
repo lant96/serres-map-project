@@ -6,47 +6,55 @@ function safeNumber(v) {
   return NaN;
 }
 
+// NocoDB linked-record fields can come back in several shapes depending on
+// the API version and field type:
+//   - an array of objects:  [{ Id: 1, title: "Eski Cami" }]
+//   - a single object:      { Id: 1, title: "Eski Cami" }
+//   - a plain string:       "Eski Cami"
+//   - null / undefined
+//
+// We always normalise to an array so the hydration layer sees consistent input.
+function normalizeToArray(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  return [val];
+}
+
 export async function getHotspots() {
   const data = await nocodbClient.getHotspots();
-  const records = data.records ?? [];
+  const records = data.records ?? data.list ?? [];
 
-  const hotspots = records.map((item) => {
-    const f = item.fields || {};
+  // ── Uncomment this log if relations still appear empty after this fix ──
+  // console.log("RAW HOTSPOT FIELDS:", JSON.stringify(records[0], null, 2));
+
+  const hotspots = records.map((item, index) => {
+    const f = item.fields ?? item;
 
     return {
-      id: item.Id ?? item.id ?? index,
-      
-      // core metadata
-      title: f.title ?? f.Title ?? f.Name ?? "Unnamed Hotspot",
-      type: f.type ?? f.Type ?? "unknown",
+      id:     item.Id ?? item.id ?? index,
+      title:  f.title  ?? "Unnamed Hotspot",
+      type:   f.type   ?? "unknown",
       status: f.status ?? "unknown",
-      
-      // spatial data
-      lat: safeNumber(f.lat ?? f.Lat),
-      lng: safeNumber(f.lng ?? f.Lng),
-
-      // geojson data
+      lat:    safeNumber(f.lat),
+      lng:    safeNumber(f.lng),
       gis_id: f.gis_id ?? null,
-
-      // relational fields (future-proofing)
-      buildingId: f.building_id ?? null,
-      imageId: f.image_id ?? null,
-      publicationId: f.publication_id ?? null,
-
-      // optional flags
       isActive: f.is_active ?? true,
+
+      // ── Raw linked-record arrays ────────────────────────────────────────
+      // Stored under *Ids names so they are clearly "pre-hydration" data.
+      // hotspotHydrationService reads these same names.
+      // Field names (building_id / image_id / publication_id) come from
+      // the NocoDB column names visible in your hotspots CSV export header.
+      buildingIds:    normalizeToArray(f.building_id),
+      imageIds:       normalizeToArray(f.image_id),
+      publicationIds: normalizeToArray(f.publication_id),
     };
   });
 
-  console.log("SUCCESSFULLY EXTRACTED HOTSPOTS:", hotspots);
+  console.log("RAW HOTSPOTS (pre-hydration):", hotspots);
 
   return hotspots.filter((h) => {
-  // buildings use gis_id instead of lat/lng
-    if (h.type === "building") {
-      return !!h.gis_id;
-    }
-    // everything else still uses coordinates
+    if (h.type === "building") return !!h.gis_id;
     return Number.isFinite(h.lat) && Number.isFinite(h.lng);
-    
   });
 }
