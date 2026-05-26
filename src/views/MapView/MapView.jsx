@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 
 import { useAppStore } from "../../state/useAppStore";
@@ -16,23 +16,36 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 export default function MapView() {
   const mapContainer = useRef(null);
   const map          = useRef(null);
+
   const markersRef   = useRef({});
   const hotspotsRef  = useRef([]);
+
   const markers      = useRef(null);
   const buildings    = useRef(null);
 
-  const hotspots               = useAppStore((s) => s.hotspots);
-  const activeFilter           = useAppStore((s) => s.activeFilter);
-  const selectedBuildingId     = useAppStore((s) => s.selectedBuildingId);
-  const selectedHotspotId      = useAppStore((s) => s.selectedHotspotId);
-  const hoveredRelatedHotspotId = useAppStore((s) => s.hoveredRelatedHotspotId);
-  const setSelection           = useAppStore((s) => s.setSelection);
+  // NEW
+  const [mapLoaded, setMapLoaded] = useState(false);
 
-  useEffect(() => { hotspotsRef.current = hotspots; }, [hotspots]);
+  const hotspots                = useAppStore((s) => s.hotspots);
+  const activeFilter            = useAppStore((s) => s.activeFilter);
 
-  // MAP INITIALISATION 
+  const selectedBuildingId      = useAppStore((s) => s.selectedBuildingId);
+  const selectedHotspotId       = useAppStore((s) => s.selectedHotspotId);
+
+  const hoveredRelatedHotspotId = useAppStore(
+    (s) => s.hoveredRelatedHotspotId
+  );
+
+  const setSelection = useAppStore((s) => s.setSelection);
+
   useEffect(() => {
-    if (map.current || !mapContainer.current) return;
+    hotspotsRef.current = hotspots;
+  }, [hotspots]);
+
+  // MAP INITIALISATION
+
+  useEffect(() => {
+    if (!mapContainer.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -42,37 +55,50 @@ export default function MapView() {
     });
 
     map.current.on("load", () => {
+
       map.current.addSource("serres-blocks", {
         type: "geojson",
         data: "/data/serres-blocks.geojson",
       });
+
       map.current.addLayer({
         id: "serres-blocks-fill",
         type: "fill",
         source: "serres-blocks",
-        paint: { "fill-color": "#c4a484", "fill-opacity": 0.25 },
+        paint: {
+          "fill-color": "#c4a484",
+          "fill-opacity": 0.25,
+        },
       });
 
       map.current.addSource("buildings", {
         type: "geojson",
         data: "/data/buildings-merarhias_02.geojson",
       });
+
       map.current.addLayer({
         id: "buildings-layer",
         type: "fill",
         source: "buildings",
-        paint: { "fill-color": "#ff0000", "fill-opacity": 0.3 },
+        paint: {
+          "fill-color": "#ff0000",
+          "fill-opacity": 0.3,
+        },
       });
 
       map.current.addSource("market", {
         type: "geojson",
         data: "/data/ottoman-market.geojson",
       });
+
       map.current.addLayer({
         id: "market-outline",
         type: "line",
         source: "market",
-        paint: { "line-color": "#3a3a3a", "line-width": 0.5 },
+        paint: {
+          "line-color": "#3a3a3a",
+          "line-width": 0.5,
+        },
       });
 
       const interactions = createMapInteractions({
@@ -80,81 +106,172 @@ export default function MapView() {
         hotspotsRef,
         setSelection,
       });
-      map.current.on("click", "buildings-layer", interactions.onBuildingClick);
-      map.current.on("click",                    interactions.onMapClick);
-      map.current.on("mouseenter", "buildings-layer", interactions.onMouseEnter);
-      map.current.on("mouseleave", "buildings-layer", interactions.onMouseLeave);
 
-      markers.current   = createMapMarkers({ map: map.current, markersRef, setSelection });
-      buildings.current = createMapBuildings({ map: map.current });
+      map.current.on(
+        "click",
+        "buildings-layer",
+        interactions.onBuildingClick
+      );
+
+      map.current.on(
+        "click",
+        interactions.onMapClick
+      );
+
+      map.current.on(
+        "mouseenter",
+        "buildings-layer",
+        interactions.onMouseEnter
+      );
+
+      map.current.on(
+        "mouseleave",
+        "buildings-layer",
+        interactions.onMouseLeave
+      );
+
+      // CREATE HELPERS
+
+      markers.current = createMapMarkers({
+        map: map.current,
+        markersRef,
+        setSelection,
+      });
+
+      buildings.current = createMapBuildings({
+        map: map.current,
+      });
+
+      // IMPORTANT
+
+      setMapLoaded(true);
     });
 
     return () => {
       Object.values(markersRef.current).forEach((m) => m.remove());
+
       map.current?.remove();
+
       map.current = null;
+
+      markers.current   = null;
+      buildings.current = null;
+
+      setMapLoaded(false);
     };
   }, []);
 
-  // MARKERS REBUILD 
-  useEffect(() => {
-    if (!markers.current) return;
-    markers.current.buildMarkers(hotspots, activeFilter);
-  }, [hotspots, activeFilter]);
+  // MARKERS REBUILD
 
-  // SELECTION HIGHLIGHT 
-  // Computes related IDs once and drives both markers and building polygons.
   useEffect(() => {
+    if (!mapLoaded) return;
+    if (!markers.current) return;
+
+    markers.current.buildMarkers(
+      hotspots,
+      activeFilter
+    );
+
+  }, [mapLoaded, hotspots, activeFilter]);
+
+  // SELECTION HIGHLIGHT
+
+  useEffect(() => {
+    if (!mapLoaded) return;
     if (!markers.current || !buildings.current) return;
 
     const currentHotspot = hotspots.find(
       (h) => String(h.id) === String(selectedHotspotId)
     );
 
-    const relatedIds = getRelatedHotspotIds(currentHotspot, hotspots);
+    const relatedIds = getRelatedHotspotIds(
+      currentHotspot,
+      hotspots
+    );
 
-    markers.current.updateMarkerSelection(selectedHotspotId, relatedIds);
+    markers.current.updateMarkerSelection(
+      selectedHotspotId,
+      relatedIds
+    );
 
     const activeGisId =
-      selectedBuildingId || currentHotspot?.gis_id || "";
+      selectedBuildingId ||
+      currentHotspot?.gis_id ||
+      "";
 
     const relatedGisIds = hotspots
-      .filter((h) => h.type === "building" && relatedIds.has(String(h.id)))
+      .filter(
+        (h) =>
+          h.type === "building" &&
+          relatedIds.has(String(h.id))
+      )
       .map((h) => h.gis_id)
       .filter(Boolean);
 
-    buildings.current.updateBuildingHighlight(activeGisId, relatedGisIds);
+    buildings.current.updateBuildingHighlight(
+      activeGisId,
+      relatedGisIds
+    );
 
-  }, [selectedHotspotId, selectedBuildingId, hotspots]);
+  }, [
+    mapLoaded,
+    selectedHotspotId,
+    selectedBuildingId,
+    hotspots,
+  ]);
 
-  // HOVER HIGHLIGHT 
-  // Fires when the user hovers over a related item in the overlay cards.
-  // Applies a temporary cyan highlight to the corresponding marker or polygon.
+  // HOVER HIGHLIGHT
+
   useEffect(() => {
+    if (!mapLoaded) return;
     if (!markers.current || !buildings.current) return;
 
     if (!hoveredRelatedHotspotId) {
       markers.current.updateHoveredMarker(null);
+
       buildings.current.updateHoveredBuilding("");
+
       return;
     }
 
     const hoveredHotspot = hotspots.find(
-      (h) => String(h.id) === String(hoveredRelatedHotspotId)
+      (h) =>
+        String(h.id) ===
+        String(hoveredRelatedHotspotId)
     );
 
-    // Marker highlight (image / publication hotspots)
-    markers.current.updateHoveredMarker(hoveredRelatedHotspotId);
+    markers.current.updateHoveredMarker(
+      hoveredRelatedHotspotId
+    );
 
-    // Polygon highlight (building hotspots)
-    const hoveredGisId = hoveredHotspot?.gis_id ?? "";
-    buildings.current.updateHoveredBuilding(hoveredGisId);
+    const hoveredGisId =
+      hoveredHotspot?.gis_id ?? "";
 
-  }, [hoveredRelatedHotspotId, hotspots]);
+    buildings.current.updateHoveredBuilding(
+      hoveredGisId
+    );
+
+  }, [
+    mapLoaded,
+    hoveredRelatedHotspotId,
+    hotspots,
+  ]);
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
-      <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "relative",
+      }}
+    >
+      <div
+        ref={mapContainer}
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+      />
     </div>
   );
 }

@@ -1,9 +1,14 @@
 import { useEffect } from "react";
 
 import { useAppStore } from "../state/useAppStore";
+
 import MapView from "../views/MapView/MapView";
+import SceneView from "../views/SceneView/SceneView";
+
 import Sidebar from "../components/sidebar/Sidebar";
 import HotspotOverlay from "../components/sidebar/overlay/HotspotOverlay";
+
+import ViewToggle from "../components/ui/ViewToggle";
 
 import { getBuildings }    from "../services/buildingService";
 import { getImages }       from "../services/imageService";
@@ -13,13 +18,17 @@ import { staggered } from "../services/api/nocodbClient"; // ← new
 
 export default function App() {
   const fetchHotspots   = useAppStore((s) => s.fetchHotspots);
+
   const setBuildings    = useAppStore((s) => s.setBuildings);
   const setImages       = useAppStore((s) => s.setImages);
   const setPublications = useAppStore((s) => s.setPublications);
+
   const setSelection    = useAppStore((s) => s.setSelection);
 
   const selectedHotspotId = useAppStore((s) => s.selectedHotspotId);
   const hotspots          = useAppStore((s) => s.hotspots);
+
+  const viewMode = useAppStore((s) => s.viewMode);
 
   useEffect(() => {
     async function loadData() {
@@ -44,18 +53,17 @@ export default function App() {
   );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        width: "100vw",
-        overflow: "hidden",
-      }}
-    >
+    <div style={styles.app}>
       <Sidebar />
 
-      <div style={{ flex: 1, position: "relative" }}>
-        <MapView />
+      <div style={styles.mainView}>
+        <ViewToggle />
+
+        {viewMode === "map" ? (
+          <MapView />
+        ) : (
+          <SceneView />
+        )}
       </div>
 
       <HotspotOverlay
@@ -65,3 +73,17 @@ export default function App() {
     </div>
   );
 }
+
+const styles = {
+  app: {
+    display: "flex",
+    width: "100vw",
+    height: "100vh",
+    overflow: "hidden",
+  },
+
+  mainView: {
+    flex: 1,
+    position: "relative",
+  },
+};

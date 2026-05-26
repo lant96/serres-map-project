@@ -25,6 +25,8 @@ export const useAppStore = create((set, get) => ({
 
   // DATA LOADING 
 
+  viewMode: "map",
+
   fetchHotspots: async () => {
     set({ isLoading: true, error: null });
 
@@ -65,6 +67,11 @@ export const useAppStore = create((set, get) => ({
   // FILTERS 
 
   setActiveFilter: (filter) => set({ activeFilter: filter }),
+
+  // VIEW MODE
+
+  setViewMode: (mode) =>
+    set({ viewMode: mode }),
 
   // DERIVED SELECTORS
 
