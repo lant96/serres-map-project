@@ -11,9 +11,13 @@ const URLS = {
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
 async function request(tableKey, { retries = 4, baseDelay = 800 } = {}) {
-  const url = URLS[tableKey];
+  const baseUrl = URLS[tableKey];
 
-  if (!url) {
+  const separator = baseUrl.includes("?") ? "&" : "?";
+
+  const url = `${baseUrl}${separator}limit=1000`;
+
+  if (!baseUrl) {
     throw new Error(
       `nocodbClient: no URL configured for "${tableKey}". ` +
       `Add VITE_NOCODB_${tableKey.toUpperCase()}_URL to your .env file.`
