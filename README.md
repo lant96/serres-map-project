@@ -3,6 +3,7 @@
 An interactive web platform for exploring the historical urban fabric of Serres, Greece — focusing on the Ottoman-era and early 20th-century built environment of the city centre.
 
 🔗 **Live demo:** [serres-map-project.vercel.app](https://serres-map-project.vercel.app)
+🏢 **Developed by:** [f8studio](https://f8studio.gr)
 
 ---
 
@@ -15,7 +16,7 @@ The platform combines archival research, architectural reconstruction, and spati
 ## Features
 
 ### Two view modes
-- **Map view** — 2D interactive map (Mapbox GL JS) with building footprints reconstructed from historical sources and geolocated image/publication markers
+- **Map view** — 2D interactive map (Mapbox GL JS) with reconstructed building footprints and geolocated image/publication markers
 - **3D view** — Three.js scene with architectural 3D models of reconstructed buildings, navigable with orbit controls
 
 ### Hotspot system
@@ -28,7 +29,7 @@ Each point of interest is a *hotspot* — a spatial node connecting a location o
 Selecting a hotspot automatically highlights all spatially related hotspots — on both the map (polygon/marker opacity) and the 3D scene (emissive material glow). Hovering over related items in the detail panel highlights their counterparts on the map or in the scene in real time.
 
 ### Detail overlay
-Clicking any hotspot opens a detail panel showing the full content of the selected entity, including image galleries (with lightbox), related building lists, and source links for publications.
+Clicking any hotspot opens a detail panel showing the full content of the selected entity, including image galleries with lightbox, related building lists, and source links for publications.
 
 ---
 
@@ -64,6 +65,7 @@ Content tables:
 src/
 ├── app/                    # Root component and global styles
 ├── components/
+│   ├── controls/           # Map controls
 │   ├── sidebar/            # Hotspot list, filter bar, detail overlay and cards
 │   └── ui/                 # View toggle
 ├── services/               # NocoDB API client and entity services
@@ -80,21 +82,6 @@ public/
 
 ---
 
-## Environment variables
-
-Create a `.env` file at the project root:
-
-```
-VITE_MAPBOX_TOKEN=your_mapbox_token
-VITE_NOCODB_TOKEN=your_nocodb_api_token
-VITE_NOCODB_URL=https://app.nocodb.com/api/v3/data/.../hotspots/records
-VITE_NOCODB_BUILDINGS_URL=https://app.nocodb.com/api/v3/data/.../buildings/records
-VITE_NOCODB_IMAGES_URL=https://app.nocodb.com/api/v3/data/.../images/records
-VITE_NOCODB_PUBLICATIONS_URL=https://app.nocodb.com/api/v3/data/.../publications/records
-```
-
----
-
 ## Local development
 
 ```bash
@@ -102,22 +89,35 @@ npm install
 npm run dev
 ```
 
-## Build
-
-```bash
-npm run build
-```
-
-The output goes to `dist/`. Upload its contents to your hosting provider's public directory.
-
 ---
 
 ## Research context
 
-This platform was developed as part of ongoing research into the historical urban landscape of Serres during the Ottoman and early post-Ottoman period. The reconstructed building footprints and 3D models are based on archival maps, photographs, and published scholarship.
+This platform was developed as part of original research conducted by f8studio
+into the historical urban landscape of Serres during the Ottoman and early
+post-Ottoman period. The reconstructed building footprints and 3D models are
+based on archival maps, photographs, and published scholarship.
+
+The research was presented as *Digital Reconstruction of Lost Urban Heritage –
+Serres, Greece* at the 1st National Conference of Architects in Serres, Greece
+(November 2025). [Conference website](https://architectureserres.gr/)
 
 ---
 
 ## Status
 
-Active development. Content is being progressively added to the NocoDB database as research continues.
+Active development. Content is being progressively added as research continues.
+
+---
+
+## Rights
+
+© 2025 f8studio. All rights reserved.
+
+The platform code, 3D reconstructions, and original research content are the 
+property of [f8studio](https://f8studio.gr).
+
+Archival images reproduced in this platform are sourced from the publications 
+listed within. All third-party content remains the property of its respective 
+rights holders and is used here solely for non-commercial research and 
+documentation purposes.
