@@ -3,7 +3,7 @@
 An interactive web platform for exploring the historical urban fabric of Serres, Greece — focusing on the Ottoman-era and early 20th-century built environment of the city centre.
 
 🔗 **Live demo:** [serres-map-project.vercel.app](https://serres-map-project.vercel.app)
-🏢 **Developed by:** [f8studio](https://f8studio.gr)
+🏢 **Developed by:** [F/8 Studio](https://f8studio.gr)
 
 ---
 
@@ -93,7 +93,7 @@ npm run dev
 
 ## Research context
 
-This platform was developed as part of original research conducted by f8studio
+This platform was developed as part of original research conducted by F/8 Studio
 into the historical urban landscape of Serres during the Ottoman and early
 post-Ottoman period. The reconstructed building footprints and 3D models are
 based on archival maps, photographs, and published scholarship.
@@ -112,10 +112,10 @@ Active development. Content is being progressively added as research continues.
 
 ## Rights
 
-© 2025 f8studio. All rights reserved.
+© 2026 F/8 Studio. All rights reserved.
 
 The platform code, 3D reconstructions, and original research content are the 
-property of [f8studio](https://f8studio.gr).
+property of [F/8 Studio](https://f8studio.gr).
 
 Archival images reproduced in this platform are sourced from the publications 
 listed within. All third-party content remains the property of its respective 
