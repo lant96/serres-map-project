@@ -2,10 +2,11 @@ import { useAppStore } from "../../state/useAppStore";
 import "../../app/styles/hotspotList.css";
 
 export default function HotspotList() {
-  const hotspots     = useAppStore((s) => s.hotspots);
-  const activeFilter = useAppStore((s) => s.activeFilter);
-
-  const setSelection = useAppStore((s) => s.setSelection);
+  const hotspots                   = useAppStore((s) => s.hotspots);
+  const activeFilter               = useAppStore((s) => s.activeFilter);
+  const selectedHotspotId          = useAppStore((s) => s.selectedHotspotId);
+  const setSelection               = useAppStore((s) => s.setSelection);
+  const setHoveredRelatedHotspotId = useAppStore((s) => s.setHoveredRelatedHotspotId);
 
   const filtered =
     activeFilter === "all"
@@ -14,16 +15,30 @@ export default function HotspotList() {
 
   return (
     <div className="hotspot-list">
-      {filtered.map((h) => (
-        <div
-          key={h.id}
-          className="hotspot-item"
-          onClick={() => setSelection("hotspot", h.id)}
-        >
-          <div className="hotspot-title">{h.title}</div>
-          <div className="hotspot-type">{h.type}</div>
-        </div>
-      ))}
+      {filtered.map((h) => {
+        const isSelected = String(h.id) === String(selectedHotspotId);
+
+        const className = [
+          "hotspot-item",
+          `hotspot-item--${h.type}`,
+          isSelected ? "selected" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        return (
+          <div
+            key={h.id}
+            className={className}
+            onClick={() => setSelection("hotspot", h.id)}
+            onMouseEnter={() => setHoveredRelatedHotspotId(String(h.id))}
+            onMouseLeave={() => setHoveredRelatedHotspotId(null)}
+          >
+            <div className="hotspot-title">{h.title}</div>
+            <div className="hotspot-type">{h.type}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }

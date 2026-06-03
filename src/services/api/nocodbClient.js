@@ -39,7 +39,7 @@ async function request(tableKey, { retries = 4, baseDelay = 800 } = {}) {
       const retryAfter = res.headers.get("Retry-After");
       const wait = retryAfter
         ? parseInt(retryAfter, 10) * 1000
-        : baseDelay * Math.pow(2, attempt);   // 800 → 1600 → 3200 → 6400 ms
+        : baseDelay * Math.pow(2, attempt);   
 
       console.warn(
         `NocoDB rate limit hit for "${tableKey}". ` +

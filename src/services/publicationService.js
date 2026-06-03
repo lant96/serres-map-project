@@ -1,5 +1,11 @@
 import { nocodbClient } from "./api/nocodbClient";
 
+function normalizeToArray(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  return [val];
+}
+
 export async function getPublications() {
   const data = await nocodbClient.getPublications();
   const records = data.records ?? data.list ?? [];
@@ -8,14 +14,14 @@ export async function getPublications() {
     const f = item.fields ?? item;
 
     return {
-      id:      item.Id ?? item.id,
-      title:   f.title   ?? f.Title   ?? "Untitled Publication",
-      authors: f.authors ?? null,
-      year:    f.year    ?? null,
+      id:    item.Id ?? item.id,
+      title: f.title ?? "Untitled",
+      year:  f.year  ?? null,
+      url:   f.url   ?? null,
 
-      // Linked records for overlay display
-      buildings: f.Buildings ?? f.buildings ?? [],
-      images:    f.Images    ?? f.images    ?? [],
+      // Linked records — hydrated later
+      buildings: normalizeToArray(f.buildings),
+      images:    normalizeToArray(f.images),
     };
   });
 }

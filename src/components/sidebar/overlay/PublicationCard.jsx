@@ -1,35 +1,50 @@
 export default function PublicationCard({ publication }) {
+  const hasRelations =
+    publication.buildings?.length > 0 || publication.images?.length > 0;
+
   return (
     <div style={styles.card}>
-      <h4 style={styles.title}>{publication.title}</h4>
 
-      {publication.authors && (
-        <p style={styles.meta}>{publication.authors}</p>
+      {/* Header — title + year */}
+      <div style={styles.header}>
+        <p style={styles.title}>{publication.title}</p>
+        {publication.year && (
+          <span style={styles.year}>{publication.year}</span>
+        )}
+      </div>
+
+      {/* Source link */}
+      {publication.url && (
+        <a
+          href={publication.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={styles.link}
+        >
+          View source ↗
+        </a>
       )}
 
-      {publication.year && (
-        <p style={styles.meta}>{publication.year}</p>
-      )}
-
-      {publication.buildings?.length > 0 && (
+      {/* Relations */}
+      {hasRelations && (
         <div style={styles.relations}>
-          <h5 style={styles.relationsLabel}>Related Buildings</h5>
-          <ul style={styles.list}>
-            {publication.buildings.map((b) => (
-              <li key={b.Id ?? b.id}>{b.title}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+          {publication.buildings?.length > 0 && (
+            <div style={styles.relationGroup}>
+              <span style={styles.relationLabel}>Buildings</span>
+              <span style={styles.relationItems}>
+                {publication.buildings.map((b) => b.title).join(", ")}
+              </span>
+            </div>
+          )}
 
-      {publication.images?.length > 0 && (
-        <div style={styles.relations}>
-          <h5 style={styles.relationsLabel}>Related Images</h5>
-          <ul style={styles.list}>
-            {publication.images.map((i) => (
-              <li key={i.Id ?? i.id}>{i.title}</li>
-            ))}
-          </ul>
+          {publication.images?.length > 0 && (
+            <div style={styles.relationGroup}>
+              <span style={styles.relationLabel}>Images</span>
+              <span style={styles.relationItems}>
+                {publication.images.map((i) => i.title).join(", ")}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -38,34 +53,68 @@ export default function PublicationCard({ publication }) {
 
 const styles = {
   card: {
-    marginBottom: 16,
-    padding: 12,
-    border: "1px solid #eee",
-    borderRadius: 8,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
   },
+
+  header: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  },
+
   title: {
-    margin: "0 0 6px",
+    margin: 0,
     fontSize: 14,
     fontWeight: 600,
+    color: "#111",
+    lineHeight: 1.5,
   },
-  meta: {
-    margin: "2px 0",
+
+  year: {
     fontSize: 12,
-    color: "#666",
+    color: "#888",
+    fontVariantNumeric: "tabular-nums",
   },
+
+  link: {
+    display: "inline-block",
+    fontSize: 12,
+    color: "#888",
+    textDecoration: "none",
+    borderBottom: "1px solid #ccc",
+    paddingBottom: 1,
+    transition: "color 0.15s ease, border-color 0.15s ease",
+    alignSelf: "flex-start",
+  },
+
   relations: {
-    marginTop: 10,
+    marginTop: 4,
+    paddingTop: 10,
+    borderTop: "1px solid #f0f0f0",
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
   },
-  relationsLabel: {
-    margin: "0 0 4px",
-    fontSize: 12,
+
+  relationGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 2,
+  },
+
+  relationLabel: {
+    fontSize: 10,
     fontWeight: 600,
-    color: "#444",
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    color: "#aaa",
   },
-  list: {
-    margin: 0,
-    paddingLeft: 16,
+
+  relationItems: {
     fontSize: 12,
     color: "#555",
+    lineHeight: 1.5,
   },
 };

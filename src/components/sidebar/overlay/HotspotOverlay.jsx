@@ -1,16 +1,20 @@
 import { useAppStore } from "../../../state/useAppStore";
-import HotspotHeader from "./HotspotHeader";
-import BuildingCard from "./BuildingCard";
-import ImageCard from "./ImageCard";
+import HotspotHeader   from "./HotspotHeader";
+import BuildingCard    from "./BuildingCard";
+import ImageCard       from "./ImageCard";
+import PublicationCard from "./PublicationCard";
 
 export default function HotspotOverlay({ hotspot, onClose }) {
-  const hotspots                  = useAppStore((s) => s.hotspots);
+  const hotspots                   = useAppStore((s) => s.hotspots);
   const setHoveredRelatedHotspotId = useAppStore((s) => s.setHoveredRelatedHotspotId);
 
   if (!hotspot) return null;
 
-  const buildingEntity = hotspot.buildings?.[0] ?? null;
-  const imageEntity    = hotspot.images?.[0]    ?? null;
+  const buildingEntity    = hotspot.buildings?.[0]    ?? null;
+  const imageEntity       = hotspot.images?.[0]       ?? null;
+  const publicationEntity = hotspot.publications?.[0] ?? null;
+
+  // ── Entity → hotspot lookup ───────────────────────────────────────────────
 
   function findHotspotForImage(img) {
     const targetId = String(img.Id ?? img.id);
@@ -30,7 +34,7 @@ export default function HotspotOverlay({ hotspot, onClose }) {
     );
   }
 
-  // Hover handlers
+  // ── Hover handlers ────────────────────────────────────────────────────────
 
   function onImageHover(img) {
     const h = findHotspotForImage(img);
@@ -48,8 +52,11 @@ export default function HotspotOverlay({ hotspot, onClose }) {
 
   return (
     <div style={styles.overlay}>
+
+      {/* Sticky header — same tone as sidebar */}
       <HotspotHeader hotspot={hotspot} onClose={onClose} />
 
+      {/* Content — white card feel inside the grey panel */}
       <div style={styles.content}>
         {hotspot.type === "building" && buildingEntity && (
           <BuildingCard
@@ -66,7 +73,12 @@ export default function HotspotOverlay({ hotspot, onClose }) {
             onBuildingHoverEnd={onHoverEnd}
           />
         )}
+
+        {hotspot.type === "publication" && publicationEntity && (
+          <PublicationCard publication={publicationEntity} />
+        )}
       </div>
+
     </div>
   );
 }
@@ -78,16 +90,18 @@ const styles = {
     left: 0,
     width: "25%",
     height: "100vh",
-    background: "#ffffff",
+    background: "#f0f0f0",
     zIndex: 9999,
     overflowY: "auto",
     pointerEvents: "auto",
-    borderRight: "1px solid #e5e7eb",
+    borderRight: "1px solid rgba(0,0,0,0.08)",
     boxShadow: "2px 0 10px rgba(0,0,0,0.08)",
   },
   content: {
-    display: "flex",
-    flexDirection: "column",
-    padding: 12,
+    margin: 12,
+    padding: 14,
+    background: "#ffffff",
+    borderRadius: 8,
+    border: "1px solid rgba(0,0,0,0.05)",
   },
 };
