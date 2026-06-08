@@ -156,7 +156,7 @@ console.log("Mesh map keys:", Array.from(meshMapRef.current.keys()));
 
     Promise.all([
       load("/models/oria_oikopedwn.glb"),
-      load("/models/buildings.glb"),
+      load("/models/buildings-02.glb"),
       load("/models/model.glb"),
     ]).then(([terrain, buildings, model]) => {
       if (!isMounted) return;
