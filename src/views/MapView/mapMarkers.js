@@ -36,8 +36,7 @@ export function createMapMarkers({ map, markersRef, setSelection }) {
       el.style.border       = "2px solid #ffffff";
       el.style.cursor       = "pointer";
       el.style.boxShadow    = "0 2px 6px rgba(0,0,0,0.3)";
-      el.style.transition   =
-        "transform 0.15s ease, opacity 0.2s ease, border-color 0.15s ease";
+      el.style.transition = "opacity 0.2s ease, border-color 0.15s ease";
 
       if (h.type === "image")            el.style.backgroundColor = "#ff4d4d";
       else if (h.type === "publication") el.style.backgroundColor = "#888888";
