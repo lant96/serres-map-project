@@ -1,104 +1,167 @@
-import mapboxgl from "mapbox-gl";
+// Native Mapbox circle layer instead of HTML div markers.
+// Circles are rendered on the WebGL canvas so they move perfectly
+// in sync with the map — no offset during pan or zoom.
+
+const SOURCE_ID = "hotspot-markers";
+const LAYER_ID  = "hotspot-markers-layer";
+
+const CIRCLE_RADIUS = 7;
+
+const COLORS = {
+  image:       { base: "#ff4d4d", selected: "#b30000" },
+  publication: { base: "#888888", selected: "#444444" },
+  building:    { base: "#aa3bff", selected: "#6600cc" },
+};
 
 export function createMapMarkers({ map, markersRef, setSelection }) {
 
-  // Internal state — stored in the closure so every update function
-  // can recompute all markers from a single source of truth.
+  // markersRef kept for API compatibility but unused —
+  // state is tracked in the closure instead.
   let _selectedId = null;
   let _relatedIds = new Set();
   let _hoveredId  = null;
 
-  // ── marker creation ───────────────────────────────────────────────────────
+  // ── Source + layer setup ──────────────────────────────────────────────────
 
-  function clearMarkers() {
-    Object.values(markersRef.current).forEach((m) => m.remove());
-    markersRef.current = {};
+  function _ensureSource() {
+    if (!map.getSource(SOURCE_ID)) {
+      map.addSource(SOURCE_ID, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+    }
   }
 
-  function buildMarkers(hotspots, activeFilter) {
-    if (!map) return;
-    clearMarkers();
+  function _ensureLayer() {
+    if (map.getLayer(LAYER_ID)) return;
 
-    const filtered =
-      activeFilter === "all"
-        ? hotspots
-        : hotspots.filter((h) => h.type === activeFilter);
-
-    filtered.forEach((h) => {
-      if (h.type === "building" || !Number.isFinite(h.lng) || !Number.isFinite(h.lat))
-        return;
-
-      const el = document.createElement("div");
-      el.className = "hotspot-marker";
-      el.style.width        = "18px";
-      el.style.height       = "18px";
-      el.style.borderRadius = "50%";
-      el.style.border       = "2px solid #ffffff";
-      el.style.cursor       = "pointer";
-      el.style.boxShadow    = "0 2px 6px rgba(0,0,0,0.3)";
-      el.style.transition = "opacity 0.2s ease, border-color 0.15s ease";
-
-      if (h.type === "image")            el.style.backgroundColor = "#ff4d4d";
-      else if (h.type === "publication") el.style.backgroundColor = "#888888";
-      else                               el.style.backgroundColor = "#aa3bff";
-
-      el.addEventListener("click", (e) => {
-        e.stopPropagation();
-        setSelection("hotspot", h.id);
-      });
-
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([h.lng, h.lat])
-        .addTo(map);
-
-      markersRef.current[h.id] = marker;
+    map.addLayer({
+      id:     LAYER_ID,
+      type:   "circle",
+      source: SOURCE_ID,
+      paint: {
+        "circle-radius":  CIRCLE_RADIUS,
+        "circle-color":   ["get", "baseColor"],
+        "circle-opacity": 1,
+      },
     });
 
-    // Re-apply current visual state to newly built markers
-    _applyStyles();
+    map.on("click", LAYER_ID, (e) => {
+      const id = e.features?.[0]?.properties?.id;
+      if (id != null) {
+        e.originalEvent.stopPropagation();
+        setSelection("hotspot", id);
+      }
+    });
+
+    map.on("mouseenter", LAYER_ID, () => {
+      map.getCanvas().style.cursor = "pointer";
+    });
+    map.on("mouseleave", LAYER_ID, () => {
+      map.getCanvas().style.cursor = "";
+    });
   }
 
-  // ── visual state ──────────────────────────────────────────────────────────
+  // ── GeoJSON builder ───────────────────────────────────────────────────────
+
+  function _toGeoJSON(hotspots) {
+    const features = hotspots
+      .filter(
+        (h) =>
+          h.type !== "building" &&
+          Number.isFinite(h.lat) &&
+          Number.isFinite(h.lng)
+      )
+      .map((h) => {
+        const colors = COLORS[h.type] ?? COLORS.building;
+        return {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [h.lng, h.lat],
+          },
+          properties: {
+            id:            h.id,
+            type:          h.type,
+            baseColor:     colors.base,
+            selectedColor: colors.selected,
+          },
+        };
+      });
+
+    return { type: "FeatureCollection", features };
+  }
+
+  // ── Paint expression builder ──────────────────────────────────────────────
   //
-  // Four states, in priority order:
-  //   selected  — black border, scaled up         (the clicked hotspot)
-  //   hovered   — cyan border, slightly scaled    (cursor over a related card item)
-  //   related   — amber border, slightly scaled   (auto-highlighted on selection)
-  //   dimmed    — white border, low opacity       (everything else when something is active)
-  //   default   — white border, full opacity      (nothing selected)
+  // One setPaintProperty call encodes all visual states.
+  // Same pattern as mapBuildings.js.
 
   function _applyStyles() {
+    if (!map.getLayer(LAYER_ID)) return;
+
     const hasActivity =
       !!_selectedId || _relatedIds.size > 0 || !!_hoveredId;
 
-    Object.keys(markersRef.current).forEach((id) => {
-      const el         = markersRef.current[id].getElement();
-      const isSelected = String(id) === String(_selectedId);
-      const isHovered  = String(id) === String(_hoveredId);
-      const isRelated  = _relatedIds.has(String(id));
+    const selectedIdStr = String(_selectedId ?? "");
+    const hoveredIdStr  = String(_hoveredId  ?? "");
+    const relatedArr    = Array.from(_relatedIds);
 
-      if (isSelected) {
-        el.style.transform   = "scale(1.4)";
-        el.style.borderColor = "#000000";
-        el.style.opacity     = "1";
-      } else if (isHovered) {
-        el.style.transform   = "scale(1.35)";
-        el.style.borderColor = "#06b6d4";   // cyan
-        el.style.opacity     = "1";
-      } else if (isRelated) {
-        el.style.transform   = "scale(1.2)";
-        el.style.borderColor = "#f59e0b";   // amber
-        el.style.opacity     = "1";
-      } else if (hasActivity) {
-        el.style.transform   = "scale(1)";
-        el.style.borderColor = "#ffffff";
-        el.style.opacity     = "0.2";
-      } else {
-        el.style.transform   = "scale(1)";
-        el.style.borderColor = "#ffffff";
-        el.style.opacity     = "1";
+    // circle-color — selected gets darker shade, rest keep base
+    const colorExpr = [
+      "case",
+      ["==", ["to-string", ["get", "id"]], selectedIdStr],
+      ["get", "selectedColor"],
+      ["get", "baseColor"],
+    ];
+
+    // circle-opacity
+    let opacityExpr;
+    if (!hasActivity) {
+      opacityExpr = 1;
+    } else {
+      const c = [];
+      c.push(["==", ["to-string", ["get", "id"]], selectedIdStr], 1);
+      if (_hoveredId) {
+        c.push(["==", ["to-string", ["get", "id"]], hoveredIdStr], 1);
       }
-    });
+      if (relatedArr.length > 0) {
+        c.push(["in", ["to-string", ["get", "id"]], ["literal", relatedArr]], 0.85);
+      }
+      c.push(0.15);
+      opacityExpr = ["case", ...c];
+    }
+
+    // circle-radius
+    let radiusExpr;
+    if (!hasActivity) {
+      radiusExpr = CIRCLE_RADIUS;
+    } else {
+      const c = [];
+      c.push(["==", ["to-string", ["get", "id"]], selectedIdStr], CIRCLE_RADIUS * 1.5);
+      if (_hoveredId) {
+        c.push(["==", ["to-string", ["get", "id"]], hoveredIdStr], CIRCLE_RADIUS * 1.3);
+      }
+      if (relatedArr.length > 0) {
+        c.push(["in", ["to-string", ["get", "id"]], ["literal", relatedArr]], CIRCLE_RADIUS * 1.15);
+      }
+      c.push(CIRCLE_RADIUS);
+      radiusExpr = ["case", ...c];
+    }
+
+    map.setPaintProperty(LAYER_ID, "circle-color",   colorExpr);
+    map.setPaintProperty(LAYER_ID, "circle-opacity",  opacityExpr);
+    map.setPaintProperty(LAYER_ID, "circle-radius",   radiusExpr);
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────────
+
+  function buildMarkers(hotspots) {
+    if (!map) return;
+    _ensureSource();
+    _ensureLayer();
+    map.getSource(SOURCE_ID).setData(_toGeoJSON(hotspots));
+    _applyStyles();
   }
 
   function updateMarkerSelection(selectedHotspotId, relatedIds = new Set()) {
