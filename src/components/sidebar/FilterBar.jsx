@@ -1,9 +1,9 @@
 import { useAppStore } from "../../state/useAppStore";
 
 const filters = [
-  { label: "Buildings",    value: "building",    color: "#aa3bff" },
+  { label: "Buildings",    value: "building",    color: "#ff4d4d" },
   { label: "Images",       value: "image",       color: "#ff4d4d" },
-  { label: "Publications", value: "publication", color: "#888888" },
+  { label: "Publications", value: "publication", color: "#ff4d4d" },
 ];
 
 export default function FilterBar() {

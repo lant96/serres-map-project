@@ -1,17 +1,29 @@
+import "../../../app/styles/sidebar.css";
+
 const TYPE_COLORS = {
-  building:    "#aa3bff",
+  building:    "#ff4d4d",
   image:       "#ff4d4d",
-  publication: "#888888",
+  publication: "#ff4d4d",
 };
 
 export default function HotspotHeader({ hotspot, onClose }) {
   const accentColor = TYPE_COLORS[hotspot.type] ?? "#cccccc";
 
+  let title = hotspot.title;
+
+  if (hotspot.type === "building") {
+    title = hotspot.buildings?.[0]?.title ?? hotspot.title;
+  } else if (hotspot.type === "image") {
+    title = hotspot.images?.[0]?.title ?? hotspot.title;
+  } else if (hotspot.type === "publication") {
+    title = hotspot.publications?.[0]?.title ?? hotspot.title;
+  }
+
   return (
     <div style={{ ...styles.header, borderLeftColor: accentColor }}>
-
       <div style={styles.text}>
-        <h2 style={styles.title}>{hotspot.title}</h2>
+        <h2 style={styles.title}>{title}</h2>
+
         {hotspot.type && (
           <span style={{ ...styles.badge, color: accentColor }}>
             {hotspot.type}
@@ -22,7 +34,6 @@ export default function HotspotHeader({ hotspot, onClose }) {
       <button style={styles.button} onClick={() => onClose?.()}>
         ×
       </button>
-
     </div>
   );
 }

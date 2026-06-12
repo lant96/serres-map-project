@@ -19,7 +19,7 @@ const FLY_OPTIONS = {
   essential: true,
 };
 
-const SELECTED_ZOOM = 18.5;
+const SELECTED_ZOOM = 18;
 
 export default function MapView() {
   const mapContainer    = useRef(null);
@@ -54,7 +54,7 @@ export default function MapView() {
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/light-v11",
       center: [23.5489, 41.089],
-      zoom: 17,
+      zoom: 16,
     });
 
     // Fetch and cache buildings GeoJSON for centroid lookups

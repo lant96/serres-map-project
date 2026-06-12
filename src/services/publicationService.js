@@ -14,12 +14,12 @@ export async function getPublications() {
     const f = item.fields ?? item;
 
     return {
-      id:    item.Id ?? item.id,
-      title: f.title ?? "Untitled",
-      year:  f.year  ?? null,
-      url:   f.url   ?? null,
+      id:                item.Id ?? item.id,
+      title:             f.title             ?? "Untitled",
+      year:              f.year              ?? null,
+      url:               f.url              ?? null,
+      short_description: f.short_description ?? null,
 
-      // Linked records — hydrated later
       buildings: normalizeToArray(f.buildings),
       images:    normalizeToArray(f.images),
     };

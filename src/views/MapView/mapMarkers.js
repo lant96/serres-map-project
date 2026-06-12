@@ -1,22 +1,14 @@
-// Native Mapbox circle layer instead of HTML div markers.
-// Circles are rendered on the WebGL canvas so they move perfectly
-// in sync with the map — no offset during pan or zoom.
-
 const SOURCE_ID = "hotspot-markers";
 const LAYER_ID  = "hotspot-markers-layer";
 
 const CIRCLE_RADIUS = 7;
 
 const COLORS = {
-  image:       { base: "#ff4d4d", selected: "#b30000" },
-  publication: { base: "#888888", selected: "#444444" },
-  building:    { base: "#aa3bff", selected: "#6600cc" },
+  image:       { base: "#ff4d4d", selected: "#b30000" }
 };
 
 export function createMapMarkers({ map, markersRef, setSelection }) {
 
-  // markersRef kept for API compatibility but unused —
-  // state is tracked in the closure instead.
   let _selectedId = null;
   let _relatedIds = new Set();
   let _hoveredId  = null;
@@ -93,9 +85,6 @@ export function createMapMarkers({ map, markersRef, setSelection }) {
   }
 
   // ── Paint expression builder ──────────────────────────────────────────────
-  //
-  // One setPaintProperty call encodes all visual states.
-  // Same pattern as mapBuildings.js.
 
   function _applyStyles() {
     if (!map.getLayer(LAYER_ID)) return;

@@ -19,7 +19,6 @@ export const useAppStore = create((set, get) => ({
 
   hoveredRelatedHotspotId: null,
 
-  // Default to buildings — first tab in the filter bar
   activeFilter: "building",
 
   viewMode: "map",
@@ -34,8 +33,7 @@ export const useAppStore = create((set, get) => ({
       const { buildings, images, publications } = get();
 
       const hydrated = hydrateHotspots({ hotspots: raw, buildings, images, publications });
-
-      console.log("HYDRATED HOTSPOTS:", hydrated);
+      
       set({ hotspots: hydrated, isLoading: false });
 
     } catch (err) {
