@@ -8,10 +8,11 @@ export default function HotspotList() {
   const setSelection               = useAppStore((s) => s.setSelection);
   const setHoveredRelatedHotspotId = useAppStore((s) => s.setHoveredRelatedHotspotId);
 
-  const filtered =
-    activeFilter === "all"
-      ? hotspots
-      : hotspots.filter((h) => h.type === activeFilter);
+  const filtered = hotspots.filter((h) => h.type === activeFilter);
+
+  if (!filtered.length) {
+    return <p style={styles.empty}>No {activeFilter}s found.</p>;
+  }
 
   return (
     <div className="hotspot-list">
@@ -35,10 +36,17 @@ export default function HotspotList() {
             onMouseLeave={() => setHoveredRelatedHotspotId(null)}
           >
             <div className="hotspot-title">{h.title}</div>
-            <div className="hotspot-type">{h.type}</div>
           </div>
         );
       })}
     </div>
   );
 }
+
+const styles = {
+  empty: {
+    padding: "16px 12px",
+    fontSize: 13,
+    color: "#aaa",
+  },
+};

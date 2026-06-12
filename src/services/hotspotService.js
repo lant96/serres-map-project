@@ -48,11 +48,14 @@ export async function getHotspots() {
     };
   });
 
-  console.log("RAW HOTSPOTS (pre-hydration):", hotspots);
-  console.log("ALL RAW RECORDS:", records.map(r => ({ 
-    title: (r.fields ?? r).title, 
-    type: (r.fields ?? r).type 
-  })));
+
+  const filtered = hotspots.filter((h) => {
+    if (h.type === "building")    return !!h.gis_id || !!h.object_name;
+    if (h.type === "publication") return true;
+    return Number.isFinite(h.lat) && Number.isFinite(h.lng);
+  });
+
+return filtered;
 
   return hotspots.filter((h) => {
     if (h.type === "building")     return !!h.gis_id || !!h.object_name;

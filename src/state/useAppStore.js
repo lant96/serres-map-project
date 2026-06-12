@@ -4,7 +4,7 @@ import { hydrateHotspots } from "../services/hotspotHydrationService";
 
 export const useAppStore = create((set, get) => ({
 
-  // STATE 
+  // ── STATE ────────────────────────────────────────────────────────────────
 
   hotspots:     [],
   buildings:    [],
@@ -17,15 +17,14 @@ export const useAppStore = create((set, get) => ({
   selectedHotspotId:  null,
   selectedBuildingId: null,
 
-  // ID of a related hotspot being hovered in the overlay cards.
-  // Drives the temporary highlight on map markers / building polygons.
   hoveredRelatedHotspotId: null,
 
-  activeFilter: "all",
-
-  // DATA LOADING 
+  // Default to buildings — first tab in the filter bar
+  activeFilter: "building",
 
   viewMode: "map",
+
+  // ── DATA LOADING ─────────────────────────────────────────────────────────
 
   fetchHotspots: async () => {
     set({ isLoading: true, error: null });
@@ -48,7 +47,7 @@ export const useAppStore = create((set, get) => ({
   setImages:       (data) => set({ images:       data }),
   setPublications: (data) => set({ publications: data }),
 
-  // SELECTION 
+  // ── SELECTION ─────────────────────────────────────────────────────────────
 
   setSelectedHotspotId:  (id) => set({ selectedHotspotId: id }),
   setSelectedBuildingId: (id) => set({ selectedBuildingId: id }),
@@ -60,26 +59,21 @@ export const useAppStore = create((set, get) => ({
       return { selectedBuildingId: null, selectedHotspotId: null };
     }),
 
-  // Hover — set to a hotspot ID while the cursor is over a related card item,
-  // clear to null on mouse-leave.
   setHoveredRelatedHotspotId: (id) => set({ hoveredRelatedHotspotId: id }),
 
-  // FILTERS 
+  // ── FILTERS ───────────────────────────────────────────────────────────────
 
   setActiveFilter: (filter) => set({ activeFilter: filter }),
 
-  // VIEW MODE
+  // ── VIEW MODE ─────────────────────────────────────────────────────────────
 
-  setViewMode: (mode) =>
-    set({ viewMode: mode }),
+  setViewMode: (mode) => set({ viewMode: mode }),
 
-  // DERIVED SELECTORS
+  // ── DERIVED SELECTORS ─────────────────────────────────────────────────────
 
   getFilteredHotspots: () => {
     const { hotspots, activeFilter } = get();
-    return activeFilter === "all"
-      ? hotspots
-      : hotspots.filter((h) => h.type === _normalizeFilter(activeFilter));
+    return hotspots.filter((h) => h.type === activeFilter);
   },
 
   getSelectedHotspot: () => {
@@ -87,10 +81,3 @@ export const useAppStore = create((set, get) => ({
     return hotspots.find((h) => String(h.id) === String(selectedHotspotId));
   },
 }));
-
-function _normalizeFilter(f) {
-  if (f === "buildings")    return "building";
-  if (f === "images")       return "image";
-  if (f === "publications") return "publication";
-  return f;
-}

@@ -1,41 +1,56 @@
 import { useAppStore } from "../../state/useAppStore";
 
 const filters = [
-  { label: "all", value: "all" },
-  { label: "images", value: "image" },
-  { label: "publications", value: "publication" },
-  { label: "buildings", value: "building" },
+  { label: "Buildings",    value: "building",    color: "#aa3bff" },
+  { label: "Images",       value: "image",       color: "#ff4d4d" },
+  { label: "Publications", value: "publication", color: "#888888" },
 ];
 
 export default function FilterBar() {
-  const activeFilter = useAppStore((s) => s.activeFilter);
+  const activeFilter    = useAppStore((s) => s.activeFilter);
   const setActiveFilter = useAppStore((s) => s.setActiveFilter);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        borderBottom: "1px solid #ddd",
-        background: "#fafafa",
-      }}
-    >
-      {filters.map((f) => (
-        <button
-          key={f.value}
-          onClick={() => setActiveFilter(f.value)}
-          style={{
-            flex: 1,
-            padding: "14px 10px",
-            border: "none",
-            background: activeFilter === f.value ? "#222" : "transparent",
-            color: activeFilter === f.value ? "#fff" : "#333",
-            cursor: "pointer",
-            textTransform: "capitalize",
-          }}
-        >
-          {f.label}
-        </button>
-      ))}
+    <div style={styles.bar}>
+      {filters.map((f) => {
+        const isActive = activeFilter === f.value;
+        return (
+          <button
+            key={f.value}
+            onClick={() => setActiveFilter(f.value)}
+            style={{
+              ...styles.button,
+              borderBottom: isActive
+                ? `2px solid ${f.color}`
+                : "2px solid transparent",
+              color: isActive ? f.color : "#888",
+              fontWeight: isActive ? 600 : 400,
+            }}
+          >
+            {f.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
+
+const styles = {
+  bar: {
+    display: "flex",
+    borderBottom: "1px solid rgba(0,0,0,0.07)",
+    background: "#f0f0f0",
+  },
+  button: {
+    flex: 1,
+    padding: "12px 6px",
+    border: "none",
+    borderBottom: "2px solid transparent",
+    background: "transparent",
+    cursor: "pointer",
+    fontSize: 12,
+    textTransform: "capitalize",
+    letterSpacing: "0.02em",
+    transition: "color 0.15s ease, border-color 0.15s ease",
+  },
+};
