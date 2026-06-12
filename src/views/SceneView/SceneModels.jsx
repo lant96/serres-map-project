@@ -146,8 +146,6 @@ export default function SceneModels() {
   const hoveredRelatedHotspotId = useAppStore((s) => s.hoveredRelatedHotspotId);
   const setSelection            = useAppStore((s) => s.setSelection);
 
-console.log("Mesh map keys:", Array.from(meshMapRef.current.keys()));
-
   useEffect(() => {
     let isMounted = true;
 
