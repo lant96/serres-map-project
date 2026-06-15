@@ -61,7 +61,14 @@ export default function App() {
       {viewMode === "map" ? <MapView /> : <SceneView />}
     </div>
 
-    <Sidebar />
+    {selectedHotspot ? (
+      <HotspotOverlay
+        hotspot={selectedHotspot}
+        onClose={() => setSelection("clear")}
+      />
+    ) : (
+      <Sidebar />
+    )}
 
     <HotspotOverlay
       hotspot={selectedHotspot}

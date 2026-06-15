@@ -43,7 +43,7 @@ const styles = {
   },
   button: {
     flex: 1,
-    padding: "12px 6px",
+    padding: "10px 6px",
     border: "none",
     borderBottom: "2px solid transparent",
     background: "transparent",

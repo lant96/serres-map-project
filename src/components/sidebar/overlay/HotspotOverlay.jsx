@@ -51,11 +51,11 @@ export default function HotspotOverlay({ hotspot, onClose }) {
   }
 
   return (
-    <div style={styles.overlay}>
+    <div className="sidebar">
 
       <HotspotHeader hotspot={hotspot} onClose={onClose} />
 
-      <div style={styles.content}>
+      <div className="sidebar-scroll">
         {hotspot.type === "building" && buildingEntity && (
           <BuildingCard
             building={buildingEntity}
@@ -84,27 +84,3 @@ export default function HotspotOverlay({ hotspot, onClose }) {
     </div>
   );
 }
-
-const styles = {
-  overlay: {
-    position: "fixed",
-    top: "30px",
-    left: "30px",
-    bottom: "30px",
-    width: "25%",
-    background: "#f0f0f0",
-    zIndex: 9999,
-    overflowY: "auto",
-    pointerEvents: "auto",
-    borderRight: "1px solid rgba(0,0,0,0.08)",
-    boxShadow: "2px 0 10px rgba(0,0,0,0.08)",
-  },
-  
-  content: {
-    margin: 12,
-    padding: 14,
-    background: "#ffffff",
-    borderRadius: 8,
-    border: "1px solid rgba(0,0,0,0.05)",
-  },
-};
