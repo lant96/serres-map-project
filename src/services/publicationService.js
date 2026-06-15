@@ -17,8 +17,10 @@ export async function getPublications() {
       id:                item.Id ?? item.id,
       title:             f.title             ?? "Untitled",
       year:              f.year              ?? null,
-      url:               f.url              ?? null,
+      url:               f.url               ?? null,
+      description:       f.description       ?? null,
       short_description: f.short_description ?? null,
+      authors:           f.authors           ?? null,
 
       buildings: normalizeToArray(f.buildings),
       images:    normalizeToArray(f.images),

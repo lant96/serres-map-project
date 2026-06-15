@@ -53,25 +53,22 @@ export default function App() {
   );
 
   return (
-    <div style={styles.app}>
-      <Sidebar />
+  <div style={styles.app}>
+    
+    <div style={styles.mainView}>
+      <ViewToggle />
 
-      <div style={styles.mainView}>
-        <ViewToggle />
-
-        {viewMode === "map" ? (
-          <MapView />
-        ) : (
-          <SceneView />
-        )}
-      </div>
-
-      <HotspotOverlay
-        hotspot={selectedHotspot}
-        onClose={() => setSelection("clear")}
-      />
+      {viewMode === "map" ? <MapView /> : <SceneView />}
     </div>
-  );
+
+    <Sidebar />
+
+    <HotspotOverlay
+      hotspot={selectedHotspot}
+      onClose={() => setSelection("clear")}
+    />
+  </div>
+);
 }
 
 const styles = {
