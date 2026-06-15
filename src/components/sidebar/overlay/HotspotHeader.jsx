@@ -62,7 +62,7 @@ const styles = {
 
   title: {
     margin: 0,
-    fontSize: 14,
+    fontSize: 20,
     fontWeight: 600,
     color: "rgba(0,0,0,0.85)",
     lineHeight: 1.4,

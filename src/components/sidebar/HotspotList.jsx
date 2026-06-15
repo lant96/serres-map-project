@@ -11,15 +11,14 @@ function ItemThumbnail({ url }) {
 function ItemMeta({ hotspot }) {
   const type = hotspot.type;
 
-  let title            = null;
-  let year             = null;
+  let title             = null;
+  let year              = null;
   let short_description = null;
 
   if (type === "building") {
-    const b          = hotspot.buildings?.[0];
-    title            = b?.title             ?? hotspot.title;
+    const b           = hotspot.buildings?.[0];
+    title             = b?.title             ?? hotspot.title;
     short_description = b?.short_description ?? null;
-    // buildings have no year
   } else if (type === "image") {
     const img         = hotspot.images?.[0];
     title             = img?.title             ?? hotspot.title;
@@ -35,16 +34,9 @@ function ItemMeta({ hotspot }) {
   return (
     <div className="hotspot-meta">
       <div className="hotspot-title">{title}</div>
-      {(year || short_description) && (
-        <div className="hotspot-subtitle">
-          {year && <span className="hotspot-year">{year}</span>}
-          {year && short_description && (
-            <span className="hotspot-subtitle-sep"> · </span>
-          )}
-          {short_description && (
-            <span className="hotspot-desc">{short_description}</span>
-          )}
-        </div>
+      {year && <div className="hotspot-year">{year}</div>}
+      {short_description && (
+        <div className="hotspot-desc">{short_description}</div>
       )}
     </div>
   );
@@ -66,7 +58,8 @@ export default function HotspotList() {
   return (
     <div className="hotspot-list">
       {filtered.map((h) => {
-        const isSelected = String(h.id) === String(selectedHotspotId);
+        const isSelected   = String(h.id) === String(selectedHotspotId);
+        const isPublication = h.type === "publication";
 
         const className = [
           "hotspot-item",
@@ -90,7 +83,12 @@ export default function HotspotList() {
             key={h.id}
             className={className}
             onClick={() => setSelection("hotspot", h.id)}
-            onMouseEnter={() => setHoveredRelatedHotspotId(String(h.id))}
+            onMouseEnter={() => {
+              // Publications have no markers — skip hover highlight
+              if (!isPublication) {
+                setHoveredRelatedHotspotId(String(h.id));
+              }
+            }}
             onMouseLeave={() => setHoveredRelatedHotspotId(null)}
           >
             {hasThumbnail && <ItemThumbnail url={thumbUrl} />}

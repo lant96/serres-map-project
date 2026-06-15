@@ -3,8 +3,9 @@ export default function ImageCard({
   onBuildingHover,
   onBuildingHoverEnd,
 }) {
-  const imgUrl          = image.image_file?.[0]?.url ?? null;
-  const relatedBuildings = image.buildings ?? [];
+  const imgUrl           = image.image_file?.[0]?.url ?? null;
+  const relatedBuildings = image.buildings    ?? [];
+  const relatedPubs      = image.publications ?? [];
 
   return (
     <div>
@@ -25,7 +26,7 @@ export default function ImageCard({
         <p style={styles.description}>{image.description}</p>
       )}
 
-      {/* Related buildings — text list, hoverable */}
+      {/* Related buildings — hoverable, highlights polygon on map */}
       {relatedBuildings.length > 0 && (
         <div>
           <h4 style={styles.sectionLabel}>Related buildings</h4>
@@ -34,11 +35,37 @@ export default function ImageCard({
               <li
                 key={b.Id ?? b.id ?? b.title}
                 style={styles.listItem}
-                // #2 — hover highlights the corresponding building polygon
                 onMouseEnter={() => onBuildingHover?.(b)}
                 onMouseLeave={() => onBuildingHoverEnd?.()}
               >
                 {b.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Related publications — text only, no map highlight */}
+      {relatedPubs.length > 0 && (
+        <div style={styles.pubsSection}>
+          <h4 style={styles.sectionLabel}>Publications</h4>
+          <ul style={styles.list}>
+            {relatedPubs.map((p) => (
+              <li key={p.Id ?? p.id ?? p.title} style={styles.pubItem}>
+                <span style={styles.pubTitle}>{p.title}</span>
+                {p.year && (
+                  <span style={styles.pubYear}> · {p.year}</span>
+                )}
+                {p.url && (
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.pubLink}
+                  >
+                    {" "}↗
+                  </a>
+                )}
               </li>
             ))}
           </ul>
@@ -59,6 +86,7 @@ const styles = {
     fontSize: 12,
     color: "#888",
     marginBottom: 4,
+    margin: "0 0 4px",
   },
   description: {
     fontSize: 13,
@@ -87,5 +115,28 @@ const styles = {
     cursor: "default",
     borderRadius: 4,
     transition: "background 0.15s ease",
+  },
+  pubsSection: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTop: "1px solid #f0f0f0",
+  },
+  pubItem: {
+    fontSize: 12,
+    color: "#555",
+    padding: "6px 0",
+    borderBottom: "1px solid #f5f5f5",
+    lineHeight: 1.5,
+  },
+  pubTitle: {
+    color: "#333",
+  },
+  pubYear: {
+    color: "#888",
+  },
+  pubLink: {
+    color: "#888",
+    textDecoration: "none",
+    fontSize: 11,
   },
 };

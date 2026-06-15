@@ -53,10 +53,8 @@ export default function HotspotOverlay({ hotspot, onClose }) {
   return (
     <div style={styles.overlay}>
 
-      {/* Sticky header — same tone as sidebar */}
       <HotspotHeader hotspot={hotspot} onClose={onClose} />
 
-      {/* Content — white card feel inside the grey panel */}
       <div style={styles.content}>
         {hotspot.type === "building" && buildingEntity && (
           <BuildingCard
@@ -75,7 +73,11 @@ export default function HotspotOverlay({ hotspot, onClose }) {
         )}
 
         {hotspot.type === "publication" && publicationEntity && (
-          <PublicationCard publication={publicationEntity} />
+          <PublicationCard
+            publication={publicationEntity}
+            onImageHover={onImageHover}
+            onImageHoverEnd={onHoverEnd}
+          />
         )}
       </div>
 
@@ -86,10 +88,10 @@ export default function HotspotOverlay({ hotspot, onClose }) {
 const styles = {
   overlay: {
     position: "fixed",
-    top: 0,
-    left: 0,
+    top: "30px",
+    left: "30px",
+    bottom: "30px",
     width: "25%",
-    height: "100vh",
     background: "#f0f0f0",
     zIndex: 9999,
     overflowY: "auto",
@@ -97,6 +99,7 @@ const styles = {
     borderRight: "1px solid rgba(0,0,0,0.08)",
     boxShadow: "2px 0 10px rgba(0,0,0,0.08)",
   },
+  
   content: {
     margin: 12,
     padding: 14,
