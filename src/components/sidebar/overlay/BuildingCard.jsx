@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Tabs from "./Tabs";
-import BackArrow from "./BackArrow";
+import BackArrow from "./Backarrow";
 import "../../../app/styles/hotspotoverlay.css";
 
 export default function BuildingCard({
