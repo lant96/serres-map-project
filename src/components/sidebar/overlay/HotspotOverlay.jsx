@@ -2,7 +2,7 @@ import { useAppStore } from "../../../state/useAppStore";
 import BuildingCard    from "./BuildingCard";
 import ImageCard       from "./ImageCard";
 import PublicationCard from "./PublicationCard";
-import "../../../app/styles/hotspotOverlay.css";
+import "../../../app/styles/hotspotoverlay.css";
 
 export default function HotspotOverlay({ hotspot, onClose }) {
   const hotspots                   = useAppStore((s) => s.hotspots);
