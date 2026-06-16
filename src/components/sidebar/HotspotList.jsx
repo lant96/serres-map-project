@@ -21,9 +21,9 @@ function ItemMeta({ hotspot }) {
     short_description = b?.short_description ?? null;
   } else if (type === "image") {
     const img         = hotspot.images?.[0];
-    title             = img?.title             ?? hotspot.title;
-    year              = img?.year              ?? null;
+    //title             = img?.title             ?? hotspot.title;
     short_description = img?.short_description ?? null;
+    year              = img?.year              ?? null;
   } else if (type === "publication") {
     const p           = hotspot.publications?.[0];
     title             = p?.title             ?? hotspot.title;
@@ -42,6 +42,28 @@ function ItemMeta({ hotspot }) {
   );
 }
 
+function HoverArrow({ color }) {
+  return (
+    <div className="hotspot-arrow" style={{ background: color }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M5 12H19M19 12L12 5M19 12L12 19"
+          stroke="#ffffff"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  );
+}
+
+const TYPE_COLORS = {
+  building:    "#ff4d4d",
+  image:       "#ff4d4d",
+  publication: "#ff4d4d",
+};
+
 export default function HotspotList() {
   const hotspots                   = useAppStore((s) => s.hotspots);
   const activeFilter               = useAppStore((s) => s.activeFilter);
@@ -58,7 +80,7 @@ export default function HotspotList() {
   return (
     <div className="hotspot-list">
       {filtered.map((h) => {
-        const isSelected   = String(h.id) === String(selectedHotspotId);
+        const isSelected    = String(h.id) === String(selectedHotspotId);
         const isPublication = h.type === "publication";
 
         const className = [
@@ -84,7 +106,6 @@ export default function HotspotList() {
             className={className}
             onClick={() => setSelection("hotspot", h.id)}
             onMouseEnter={() => {
-              // Publications have no markers — skip hover highlight
               if (!isPublication) {
                 setHoveredRelatedHotspotId(String(h.id));
               }
@@ -93,6 +114,7 @@ export default function HotspotList() {
           >
             {hasThumbnail && <ItemThumbnail url={thumbUrl} />}
             <ItemMeta hotspot={h} />
+            <HoverArrow color={TYPE_COLORS[h.type] ?? "#999"} />
           </div>
         );
       })}

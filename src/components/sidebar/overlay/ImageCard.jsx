@@ -1,35 +1,37 @@
+import { useState } from "react";
+import Tabs from "./Tabs";
+import BackArrow from "./BackArrow";
+import "../../../app/styles/hotspotoverlay.css";
+
 export default function ImageCard({
   image,
   onBuildingHover,
   onBuildingHoverEnd,
+  onClose,
 }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   const imgUrl           = image.image_file?.[0]?.url ?? null;
   const relatedBuildings = image.buildings    ?? [];
   const relatedPubs      = image.publications ?? [];
 
-  return (
+  // ── Info tab ───────────────────────────────────────────────────────────
+  const infoContent = (
     <div>
-      {/* Photo */}
-      {imgUrl && (
-        <img
-          src={imgUrl}
-          alt={image.title ?? ""}
-          style={styles.photo}
-        />
-      )}
-
-      {/* Year */}
-      {image.year && <p style={styles.year}>{image.year}</p>}
-
-      {/* Description */}
-      {image.description && (
+      {image.description ? (
         <p style={styles.description}>{image.description}</p>
+      ) : (
+        <p style={styles.emptyState}>No additional information yet.</p>
       )}
+    </div>
+  );
 
-      {/* Related buildings — hoverable, highlights polygon on map */}
+  // ── Related tab ────────────────────────────────────────────────────────
+  const relatedContent = (
+    <div>
       {relatedBuildings.length > 0 && (
         <div>
-          <h4 style={styles.sectionLabel}>Related buildings</h4>
+          <h4 style={styles.sectionLabel}>Buildings</h4>
           <ul style={styles.list}>
             {relatedBuildings.map((b) => (
               <li
@@ -45,23 +47,20 @@ export default function ImageCard({
         </div>
       )}
 
-      {/* Related publications — text only, no map highlight */}
       {relatedPubs.length > 0 && (
-        <div style={styles.pubsSection}>
+        <div style={relatedBuildings.length > 0 ? styles.secondGroup : undefined}>
           <h4 style={styles.sectionLabel}>Publications</h4>
           <ul style={styles.list}>
             {relatedPubs.map((p) => (
-              <li key={p.Id ?? p.id ?? p.title} style={styles.pubItem}>
-                <span style={styles.pubTitle}>{p.title}</span>
-                {p.year && (
-                  <span style={styles.pubYear}> · {p.year}</span>
-                )}
+              <li key={p.Id ?? p.id ?? p.title} style={styles.listItem}>
+                <span>{p.title}</span>
+                {p.year && <span style={styles.listItemMeta}> · {p.year}</span>}
                 {p.url && (
                   <a
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={styles.pubLink}
+                    style={styles.listItemLink}
                   >
                     {" "}↗
                   </a>
@@ -71,28 +70,76 @@ export default function ImageCard({
           </ul>
         </div>
       )}
+
+      {relatedBuildings.length === 0 && relatedPubs.length === 0 && (
+        <p style={styles.emptyState}>No related items yet.</p>
+      )}
+    </div>
+  );
+
+  const tabs = [
+    { key: "info",    label: "Info",    content: infoContent },
+    { key: "related", label: "Related", content: relatedContent },
+  ];
+
+  return (
+    <div>
+      {/* Hero — archival photo, clickable for lightbox, back arrow floats on top */}
+      <div className="hotspot-hero-wrapper">
+        <BackArrow onClose={onClose} />
+        {imgUrl ? (
+          <img
+            src={imgUrl}
+            alt={image.title ?? ""}
+            className="hotspot-hero-image"
+            onClick={() => setLightboxOpen(true)}
+          />
+        ) : (
+          <div className="hotspot-hero-placeholder">No image available</div>
+        )}
+      </div>
+
+      <div className="hotspot-body">
+        <h2 className="hotspot-body-title">{image.title}</h2>
+        <div className="hotspot-body-meta">
+          <span className="hotspot-body-tag">Image</span>
+          {image.year && <span>{image.year}</span>}
+        </div>
+
+        <Tabs tabs={tabs} accentColor="#ff4d4d" />
+      </div>
+
+      {lightboxOpen && imgUrl && (
+        <div style={styles.lightboxBackdrop} onClick={() => setLightboxOpen(false)}>
+          <button
+            style={styles.lightboxClose}
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Close"
+          >
+            ×
+          </button>
+          <img
+            src={imgUrl}
+            style={styles.lightboxImage}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 const styles = {
-  photo: {
-    width: "100%",
-    borderRadius: 6,
-    marginBottom: 12,
-    display: "block",
-  },
-  year: {
-    fontSize: 12,
-    color: "#888",
-    marginBottom: 4,
-    margin: "0 0 4px",
-  },
   description: {
     fontSize: 13,
     color: "#444",
     lineHeight: 1.6,
-    marginBottom: 16,
+    margin: 0,
+  },
+  emptyState: {
+    fontSize: 13,
+    color: "#aaa",
+    margin: 0,
   },
   sectionLabel: {
     fontSize: 12,
@@ -101,6 +148,9 @@ const styles = {
     letterSpacing: "0.05em",
     color: "#888",
     marginBottom: 6,
+  },
+  secondGroup: {
+    marginTop: 14,
   },
   list: {
     listStyle: "none",
@@ -112,31 +162,45 @@ const styles = {
     color: "#333",
     padding: "6px 8px",
     borderBottom: "1px solid #f0f0f0",
-    cursor: "default",
     borderRadius: 4,
     transition: "background 0.15s ease",
   },
-  pubsSection: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTop: "1px solid #f0f0f0",
-  },
-  pubItem: {
-    fontSize: 12,
-    color: "#555",
-    padding: "6px 0",
-    borderBottom: "1px solid #f5f5f5",
-    lineHeight: 1.5,
-  },
-  pubTitle: {
-    color: "#333",
-  },
-  pubYear: {
+  listItemMeta: {
     color: "#888",
   },
-  pubLink: {
+  listItemLink: {
     color: "#888",
     textDecoration: "none",
-    fontSize: 11,
+    fontSize: 12,
+  },
+  lightboxBackdrop: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.85)",
+    zIndex: 99999,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "zoom-out",
+  },
+  lightboxImage: {
+    maxWidth: "90vw",
+    maxHeight: "90vh",
+    objectFit: "contain",
+    borderRadius: 6,
+    cursor: "default",
+    boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+  },
+  lightboxClose: {
+    position: "absolute",
+    top: 20,
+    right: 24,
+    background: "transparent",
+    border: "none",
+    color: "#fff",
+    fontSize: 36,
+    cursor: "pointer",
+    lineHeight: 1,
+    padding: 0,
   },
 };

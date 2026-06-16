@@ -1,0 +1,111 @@
+.hotspot-overlay-inner {
+  flex: 1;
+  overflow-y: auto;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  padding: 8px;
+
+  scroll-behavior: smooth;
+}
+
+/* ── Hero image (building plan / archival photo) ──────────────────────────── */
+
+.hotspot-hero-wrapper {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  flex-shrink: 0;
+  background: #e2e2e2;
+  overflow: hidden;
+  border-radius: 16px 16px 0px 0px;
+}
+
+.hotspot-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #fff;
+  padding: 10px;
+}
+
+.hotspot-hero-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: rgba(0,0,0,0.35);
+}
+
+/* ── Back arrow — floats on the hero image ────────────────────────────────── */
+
+.hotspot-back-button {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 10;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+
+  transition: transform 0.15s ease;
+}
+
+.hotspot-back-button:hover {
+  transform: scale(1.06);
+}
+
+/* Variant used when there's no hero image (e.g. publications) */
+.hotspot-back-button--standalone {
+  position: relative;
+  top: 0;
+  left: 0;
+  margin: 16px 0 0 16px;
+}
+
+/* ── Body content below the hero ──────────────────────────────────────────── */
+
+.hotspot-body {
+  padding: 16px 18px;
+}
+
+.hotspot-body-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.88);
+  line-height: 1.35;
+}
+
+.hotspot-body-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: rgba(0,0,0,0.45);
+}
+
+.hotspot-body-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+  font-size: 11px;
+  text-transform: capitalize;
+}

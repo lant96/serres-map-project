@@ -72,7 +72,7 @@ export default function MapView() {
         id: "serres-blocks-fill",
         type: "fill",
         source: "serres-blocks",
-        paint: { "fill-color": "#c4a484", "fill-opacity": 0.25 },
+        paint: { "fill-color": "#e0dccd", "fill-opacity": 0.4 },
       });
 
       map.current.addSource("buildings", {
@@ -83,7 +83,7 @@ export default function MapView() {
         id: "buildings-layer",
         type: "fill",
         source: "buildings",
-        paint: { "fill-color": "#ff0000", "fill-opacity": 0.3 },
+        paint: { "fill-color": "#ff4d4d", "fill-opacity": 0.3 },
       });
 
       map.current.addSource("market", {

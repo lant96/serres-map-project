@@ -20,11 +20,10 @@ export default function FilterBar() {
             onClick={() => setActiveFilter(f.value)}
             style={{
               ...styles.button,
-              borderBottom: isActive
-                ? `2px solid ${f.color}`
-                : "2px solid transparent",
-              color: isActive ? f.color : "#888",
-              fontWeight: isActive ? 600 : 400,
+              color: isActive ? f.color : "#101010",
+              fontWeight: 500,
+              borderBottomColor: isActive ? f.color : "transparent",
+              fontSize: "15px",
             }}
           >
             {f.label}
@@ -38,19 +37,15 @@ export default function FilterBar() {
 const styles = {
   bar: {
     display: "flex",
-    borderBottom: "1px solid rgba(0,0,0,0.07)",
-    background: "#f0f0f0",
+    gap: 18,
   },
   button: {
-    flex: 1,
-    padding: "10px 6px",
+    background: "transparent",
     border: "none",
     borderBottom: "2px solid transparent",
-    background: "transparent",
+    padding: "0 0 6px",
     cursor: "pointer",
-    fontSize: 12,
-    textTransform: "capitalize",
-    letterSpacing: "0.02em",
+    fontSize: 13,
     transition: "color 0.15s ease, border-color 0.15s ease",
   },
 };

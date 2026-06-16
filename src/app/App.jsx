@@ -14,7 +14,9 @@ import { getBuildings }    from "../services/buildingService";
 import { getImages }       from "../services/imageService";
 import { getPublications } from "../services/publicationService";
 
-import { staggered } from "../services/api/nocodbClient"; // ← new
+import { staggered } from "../services/api/nocodbClient";
+
+import "../app/styles/panel.css";
 
 export default function App() {
   const fetchHotspots   = useAppStore((s) => s.fetchHotspots);
@@ -26,7 +28,7 @@ export default function App() {
   const setSelection    = useAppStore((s) => s.setSelection);
 
   const selectedHotspotId = useAppStore((s) => s.selectedHotspotId);
-  const hotspots          = useAppStore((s) => s.hotspots);
+  const hotspots           = useAppStore((s) => s.hotspots);
 
   const viewMode = useAppStore((s) => s.viewMode);
 
@@ -53,42 +55,54 @@ export default function App() {
   );
 
   return (
-  <div style={styles.app}>
-    
-    <div style={styles.mainView}>
-      <ViewToggle />
+    <div style={styles.app}>
 
-      {viewMode === "map" ? <MapView /> : <SceneView />}
+      {/* Map/Scene fills the entire viewport, behind everything */}
+      <div style={styles.mainView}>
+        <ViewToggle />
+        {viewMode === "map" ? <MapView /> : <SceneView />}
+      </div>
+
+      {/* Single floating panel — header always on top, content swaps below it */}
+      <div className="floating-panel">
+
+        <div className="floating-panel-header">
+          <h1 className="floating-panel-title">Serres Historical Map</h1>
+          <p className="sidebar-subtitle">
+            Explore reconstructed buildings, archival images, and publications.
+          </p>
+        </div>
+
+        <div className="floating-panel-content">
+          {selectedHotspot ? (
+            <HotspotOverlay
+              hotspot={selectedHotspot}
+              onClose={() => setSelection("clear")}
+            />
+          ) : (
+            <Sidebar />
+          )}
+        </div>
+
+      </div>
+
     </div>
-
-    {selectedHotspot ? (
-      <HotspotOverlay
-        hotspot={selectedHotspot}
-        onClose={() => setSelection("clear")}
-      />
-    ) : (
-      <Sidebar />
-    )}
-
-    <HotspotOverlay
-      hotspot={selectedHotspot}
-      onClose={() => setSelection("clear")}
-    />
-  </div>
-);
+  );
 }
 
 const styles = {
   app: {
-    display: "flex",
+    position: "relative",
     width: "100vw",
     height: "100vh",
     overflow: "hidden",
   },
 
   mainView: {
-    flex: 1,
-    position: "relative",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-
 };

@@ -4,7 +4,8 @@ import "../../app/styles/sidebar.css";
 
 export default function Sidebar() {
   return (
-    <div className="sidebar">
+    <div className="sidebar-inner">
+
       <div className="sidebar-section">
         <FilterBar />
       </div>
@@ -12,6 +13,7 @@ export default function Sidebar() {
       <div className="sidebar-scroll">
         <HotspotList />
       </div>
+
     </div>
   );
 }

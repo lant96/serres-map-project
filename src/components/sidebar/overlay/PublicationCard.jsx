@@ -1,37 +1,28 @@
 import { useState } from "react";
+import Tabs from "./Tabs";
+import BackArrow from "./BackArrow";
+import "../../../app/styles/hotspotoverlay.css";
 
 export default function PublicationCard({
   publication,
   onImageHover,
   onImageHoverEnd,
+  onClose,
 }) {
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
   const relatedImages    = publication.images    ?? [];
   const relatedBuildings = publication.buildings ?? [];
-  const hasRelations     = relatedImages.length > 0 || relatedBuildings.length > 0;
 
-  return (
-    <div style={styles.card}>
-
-      {/* Year */}
-      <div style={styles.header}>
-        {publication.year && (
-          <span style={styles.year}>{publication.year}</span>
-        )}
-      </div>
-
-      {/* Authors */}
-      {publication.authors && (
-        <p style={styles.year}>{publication.authors}</p>
-      )}
-
-      {/* Description */}
-      {publication.description && (
+  // ── Info tab ───────────────────────────────────────────────────────────
+  const infoContent = (
+    <div>
+      {publication.description ? (
         <p style={styles.description}>{publication.description}</p>
+      ) : (
+        <p style={styles.emptyState}>No additional information yet.</p>
       )}
 
-      {/* Source link */}
       {publication.url && (
         <a
           href={publication.url}
@@ -42,11 +33,15 @@ export default function PublicationCard({
           View source ↗
         </a>
       )}
+    </div>
+  );
 
-      {/* Related images — gallery, same as BuildingCard */}
+  // ── Related tab ────────────────────────────────────────────────────────
+  const relatedContent = (
+    <div>
       {relatedImages.length > 0 && (
         <div>
-          <h4 style={styles.sectionLabel}>Related images</h4>
+          <h4 style={styles.sectionLabel}>Images</h4>
           <div style={styles.gallery}>
             {relatedImages.map((img) => {
               const imgUrl = img.image_file?.[0]?.url ?? null;
@@ -68,12 +63,47 @@ export default function PublicationCard({
         </div>
       )}
 
-      {/* Lightbox */}
+      {relatedBuildings.length > 0 && (
+        <div style={relatedImages.length > 0 ? styles.secondGroup : undefined}>
+          <h4 style={styles.sectionLabel}>Buildings</h4>
+          <ul style={styles.list}>
+            {relatedBuildings.map((b) => (
+              <li key={b.Id ?? b.id ?? b.title} style={styles.listItem}>
+                {b.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {relatedImages.length === 0 && relatedBuildings.length === 0 && (
+        <p style={styles.emptyState}>No related items yet.</p>
+      )}
+    </div>
+  );
+
+  const tabs = [
+    { key: "info",    label: "Info",    content: infoContent },
+    { key: "related", label: "Related", content: relatedContent },
+  ];
+
+  return (
+    <div>
+      {/* No hero image — back arrow sits standalone at the top of the panel */}
+      <BackArrow onClose={onClose} standalone />
+
+      <div className="hotspot-body">
+        <h2 className="hotspot-body-title">{publication.title}</h2>
+        <div className="hotspot-body-meta">
+          <span className="hotspot-body-tag">Publication</span>
+          {publication.year && <span>{publication.year}</span>}
+        </div>
+
+        <Tabs tabs={tabs} accentColor="#ff4d4d" />
+      </div>
+
       {lightboxUrl && (
-        <div
-          style={styles.lightboxBackdrop}
-          onClick={() => setLightboxUrl(null)}
-        >
+        <div style={styles.lightboxBackdrop} onClick={() => setLightboxUrl(null)}>
           <button
             style={styles.lightboxClose}
             onClick={() => setLightboxUrl(null)}
@@ -88,38 +118,20 @@ export default function PublicationCard({
           />
         </div>
       )}
-
     </div>
   );
 }
 
 const styles = {
-  card: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-  },
-  header: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-  },
-  title: {
-    margin: 0,
-    fontSize: 14,
-    fontWeight: 600,
-    color: "#111",
-    lineHeight: 1.5,
-  },
-  year: {
-    fontSize: 12,
-    color: "#888",
-    fontVariantNumeric: "tabular-nums",
-  },
   description: {
     fontSize: 13,
     color: "#444",
     lineHeight: 1.6,
+    margin: "0 0 10px",
+  },
+  emptyState: {
+    fontSize: 13,
+    color: "#aaa",
     margin: 0,
   },
   link: {
@@ -129,8 +141,6 @@ const styles = {
     textDecoration: "none",
     borderBottom: "1px solid #ccc",
     paddingBottom: 1,
-    alignSelf: "flex-start",
-    transition: "color 0.15s ease, border-color 0.15s ease",
   },
   sectionLabel: {
     fontSize: 12,
@@ -139,6 +149,9 @@ const styles = {
     letterSpacing: "0.05em",
     color: "#888",
     marginBottom: 8,
+  },
+  secondGroup: {
+    marginTop: 14,
   },
   gallery: {
     display: "grid",
@@ -153,10 +166,6 @@ const styles = {
     display: "block",
     cursor: "pointer",
     transition: "opacity 0.15s ease",
-  },
-  relations: {
-    paddingTop: 10,
-    borderTop: "1px solid #f0f0f0",
   },
   list: {
     listStyle: "none",

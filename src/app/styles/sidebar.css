@@ -1,34 +1,12 @@
-.sidebar {
-  width: 25%;
-  min-width: 300px;
-
-  position: fixed;
-  top: 30px;
-  left: 30px;
-  bottom: 30px;
-
+.sidebar-inner {
   display: flex;
   flex-direction: column;
-
-  background: rgba(240, 240, 240, 0.92);
-  backdrop-filter: blur(10px);
-
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 12px;
-
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-
-  z-index: 10;
-
+  height: 100%;
   overflow: hidden;
 }
 
 .sidebar-section {
-  padding: 12px;
-}
-
-.sidebar-section + .sidebar-section {
-  margin-top: 6px;
+  flex-shrink: 0;
 }
 
 .sidebar-scroll {

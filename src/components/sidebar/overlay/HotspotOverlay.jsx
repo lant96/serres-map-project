@@ -1,8 +1,8 @@
 import { useAppStore } from "../../../state/useAppStore";
-import HotspotHeader   from "./HotspotHeader";
 import BuildingCard    from "./BuildingCard";
 import ImageCard       from "./ImageCard";
 import PublicationCard from "./PublicationCard";
+import "../../../app/styles/hotspotOverlay.css";
 
 export default function HotspotOverlay({ hotspot, onClose }) {
   const hotspots                   = useAppStore((s) => s.hotspots);
@@ -13,8 +13,6 @@ export default function HotspotOverlay({ hotspot, onClose }) {
   const buildingEntity    = hotspot.buildings?.[0]    ?? null;
   const imageEntity       = hotspot.images?.[0]       ?? null;
   const publicationEntity = hotspot.publications?.[0] ?? null;
-
-  // ── Entity → hotspot lookup ───────────────────────────────────────────────
 
   function findHotspotForImage(img) {
     const targetId = String(img.Id ?? img.id);
@@ -34,8 +32,6 @@ export default function HotspotOverlay({ hotspot, onClose }) {
     );
   }
 
-  // ── Hover handlers ────────────────────────────────────────────────────────
-
   function onImageHover(img) {
     const h = findHotspotForImage(img);
     if (h) setHoveredRelatedHotspotId(String(h.id));
@@ -51,36 +47,33 @@ export default function HotspotOverlay({ hotspot, onClose }) {
   }
 
   return (
-    <div className="sidebar">
+    <div className="hotspot-overlay-inner">
+      {hotspot.type === "building" && buildingEntity && (
+        <BuildingCard
+          building={buildingEntity}
+          onImageHover={onImageHover}
+          onImageHoverEnd={onHoverEnd}
+          onClose={onClose}
+        />
+      )}
 
-      <HotspotHeader hotspot={hotspot} onClose={onClose} />
+      {hotspot.type === "image" && imageEntity && (
+        <ImageCard
+          image={imageEntity}
+          onBuildingHover={onBuildingHover}
+          onBuildingHoverEnd={onHoverEnd}
+          onClose={onClose}
+        />
+      )}
 
-      <div className="sidebar-scroll">
-        {hotspot.type === "building" && buildingEntity && (
-          <BuildingCard
-            building={buildingEntity}
-            onImageHover={onImageHover}
-            onImageHoverEnd={onHoverEnd}
-          />
-        )}
-
-        {hotspot.type === "image" && imageEntity && (
-          <ImageCard
-            image={imageEntity}
-            onBuildingHover={onBuildingHover}
-            onBuildingHoverEnd={onHoverEnd}
-          />
-        )}
-
-        {hotspot.type === "publication" && publicationEntity && (
-          <PublicationCard
-            publication={publicationEntity}
-            onImageHover={onImageHover}
-            onImageHoverEnd={onHoverEnd}
-          />
-        )}
-      </div>
-
+      {hotspot.type === "publication" && publicationEntity && (
+        <PublicationCard
+          publication={publicationEntity}
+          onImageHover={onImageHover}
+          onImageHoverEnd={onHoverEnd}
+          onClose={onClose}
+        />
+      )}
     </div>
   );
 }
