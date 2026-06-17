@@ -5,24 +5,26 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
 
-  padding: 8px;
-
   scroll-behavior: smooth;
 }
-
-/* ── Hero image (building plan / archival photo) ──────────────────────────── */
 
 .hotspot-hero-wrapper {
   position: relative;
   width: 100%;
   height: 300px;
-  flex-shrink: 0;
   background: #e2e2e2;
   overflow: hidden;
-  border-radius: 16px 16px 0px 0px;
 }
 
 .hotspot-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #fff;
+}
+
+.hotspot-hero-image-building {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -40,8 +42,6 @@
   font-size: 12px;
   color: rgba(0,0,0,0.35);
 }
-
-/* ── Back arrow — floats on the hero image ────────────────────────────────── */
 
 .hotspot-back-button {
   position: absolute;
@@ -69,7 +69,6 @@
   transform: scale(1.06);
 }
 
-/* Variant used when there's no hero image (e.g. publications) */
 .hotspot-back-button--standalone {
   position: relative;
   top: 0;
@@ -77,10 +76,8 @@
   margin: 16px 0 0 16px;
 }
 
-/* ── Body content below the hero ──────────────────────────────────────────── */
-
 .hotspot-body {
-  padding: 16px 18px;
+  padding: 20px;
 }
 
 .hotspot-body-title {

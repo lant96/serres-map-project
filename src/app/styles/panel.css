@@ -6,7 +6,6 @@
 
   width: 25%;
   min-width: 320px;
-  padding: 20px;
 
   background: #F4F3F0;
   border-radius: 16px;
@@ -19,10 +18,9 @@
   z-index: 9999;
 }
 
-/* ── Shared header — always present, list or detail view alike ───────────── */
-
 .floating-panel-header {
   flex-shrink: 0;
+  padding: 20px;
 }
 
 .floating-panel-title {
@@ -34,18 +32,16 @@
 }
 
 .sidebar-subtitle {
-  margin: 0 0 12px;
-  padding-bottom: 10px;
+  margin: 0;
   font-size: 12px;
   line-height: 1.5;
   color: #101010;
 }
-
-/* ── Content slot — list or detail content swaps here ─────────────────────── */
 
 .floating-panel-content {
   flex: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-radius: 16px 16px 0px 0px;
 }

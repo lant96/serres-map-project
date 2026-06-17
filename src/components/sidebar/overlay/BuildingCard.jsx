@@ -97,7 +97,7 @@ export default function BuildingCard({
           <img
             src={planUrl}
             alt={`2d plan — ${building.title}`}
-            className="hotspot-hero-image"
+            className="hotspot-hero-image-building"
             onClick={() => setLightboxUrl(planUrl)}
           />
         ) : (

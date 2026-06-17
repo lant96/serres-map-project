@@ -4,8 +4,6 @@ import { hydrateHotspots } from "../services/hotspotHydrationService";
 
 export const useAppStore = create((set, get) => ({
 
-  // ── STATE ────────────────────────────────────────────────────────────────
-
   hotspots:     [],
   buildings:    [],
   images:       [],
@@ -23,7 +21,7 @@ export const useAppStore = create((set, get) => ({
 
   viewMode: "map",
 
-  // ── DATA LOADING ─────────────────────────────────────────────────────────
+  // Data Loading
 
   fetchHotspots: async () => {
     set({ isLoading: true, error: null });
@@ -45,7 +43,7 @@ export const useAppStore = create((set, get) => ({
   setImages:       (data) => set({ images:       data }),
   setPublications: (data) => set({ publications: data }),
 
-  // ── SELECTION ─────────────────────────────────────────────────────────────
+  // Selection
 
   setSelectedHotspotId:  (id) => set({ selectedHotspotId: id }),
   setSelectedBuildingId: (id) => set({ selectedBuildingId: id }),
@@ -59,23 +57,8 @@ export const useAppStore = create((set, get) => ({
 
   setHoveredRelatedHotspotId: (id) => set({ hoveredRelatedHotspotId: id }),
 
-  // ── FILTERS ───────────────────────────────────────────────────────────────
-
   setActiveFilter: (filter) => set({ activeFilter: filter }),
-
-  // ── VIEW MODE ─────────────────────────────────────────────────────────────
 
   setViewMode: (mode) => set({ viewMode: mode }),
 
-  // ── DERIVED SELECTORS ─────────────────────────────────────────────────────
-
-  getFilteredHotspots: () => {
-    const { hotspots, activeFilter } = get();
-    return hotspots.filter((h) => h.type === activeFilter);
-  },
-
-  getSelectedHotspot: () => {
-    const { hotspots, selectedHotspotId } = get();
-    return hotspots.find((h) => String(h.id) === String(selectedHotspotId));
-  },
 }));
