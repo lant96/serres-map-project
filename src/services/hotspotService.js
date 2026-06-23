@@ -30,6 +30,8 @@ export async function getHotspots() {
       gis_id:      f.gis_id      ?? null,
       object_name: f.object_name ?? null,
 
+      // 3D scene position — Blender units, multiplied by 0.05 at render time
+      // to match the GLB primitive scale.
       pos_x: safeNumber(f.pos_x),
       pos_y: safeNumber(f.pos_y),
       pos_z: safeNumber(f.pos_z),
@@ -45,6 +47,17 @@ export async function getHotspots() {
   return hotspots.filter((h) => {
     if (h.type === "building")    return !!h.gis_id || !!h.object_name;
     if (h.type === "publication") return true;
+
+    // Images can appear on the 2D map (lat/lng) or the 3D scene (pos_x/y/z)
+    // or both — pass through if either set of coordinates is valid.
+    if (h.type === "image") {
+      const hasMapCoords   = Number.isFinite(h.lat)   && Number.isFinite(h.lng);
+      const hasSceneCoords = Number.isFinite(h.pos_x) &&
+                             Number.isFinite(h.pos_y) &&
+                             Number.isFinite(h.pos_z);
+      return hasMapCoords || hasSceneCoords;
+    }
+
     return Number.isFinite(h.lat) && Number.isFinite(h.lng);
   });
 }

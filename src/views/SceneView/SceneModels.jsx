@@ -5,10 +5,6 @@ import { useAppStore } from "../../state/useAppStore";
 import { getRelatedHotspotIds } from "../../state/selectors";
 import { gltfLoader } from "./loaders/gltfLoader";
 
-// ── Material helpers ─────────────────────────────────────────────────────────
-
-// Clone all materials in the scene and store their original values so we can
-// restore them cleanly when returning to the default state.
 function prepareMaterials(scene) {
   scene.traverse((child) => {
     if (!child.isMesh || !child.material) return;
@@ -17,12 +13,10 @@ function prepareMaterials(scene) {
     child.castShadow    = true;
     child.receiveShadow = true;
 
-    // Baseline shared setup
     child.material.roughness  = 1;
     child.material.metalness  = 0;
     child.material.depthWrite = child.material.opacity === 1;
 
-    // Snapshot original values for state restoration
     child.userData.origEmissive =
       child.material.emissive?.clone() ?? new THREE.Color(0, 0, 0);
     child.userData.origEmissiveIntensity =
@@ -33,14 +27,6 @@ function prepareMaterials(scene) {
   });
 }
 
-// Four visual states — mirrors the map marker / polygon logic exactly.
-//
-//   selected  — warm orange emissive glow
-//   hovered   — cyan emissive glow  (cursor over a related item in the overlay)
-//   related   — amber emissive glow (auto-highlighted relations)
-//   dimmed    — near-transparent    (everything else while something is active)
-//   default   — original material   (nothing selected)
-//
 function applyMeshState(mesh, state) {
   const m = mesh.material;
   if (!m) return;
@@ -78,7 +64,7 @@ function applyMeshState(mesh, state) {
       m.depthWrite  = false;
       break;
 
-    default: // "default"
+    default:
       m.emissive?.copy(
         mesh.userData.origEmissive ?? new THREE.Color(0, 0, 0)
       );
@@ -92,7 +78,7 @@ function applyMeshState(mesh, state) {
 
 
 function buildMeshMap(scene) {
-  const map = new Map(); // baseName → THREE.Mesh[]
+  const map = new Map();
 
   scene.traverse((obj) => {
     if (!obj.isMesh) return;
@@ -171,6 +157,15 @@ export default function SceneModels() {
       });
 
       prepareMaterials(buildings.scene);
+      buildings.scene.traverse((c) => {
+        if (!c.isMesh || !c.material) return;
+        c.material.opacity     = 0.4;
+        c.material.transparent = true;
+        c.material.depthWrite  = false;
+        c.userData.origOpacity     = 0.4;
+        c.userData.origTransparent = true;
+        c.userData.origDepthWrite  = false;
+      });
 
       prepareMaterials(model.scene);
       meshMapRef.current = buildMeshMap(model.scene);
@@ -220,11 +215,12 @@ export default function SceneModels() {
 
   return (
     <>
-      <primitive object={models.terrain.scene}   scale={0.05} />
-      <primitive object={models.buildings.scene} scale={0.05} />
+      <primitive object={models.terrain.scene}   scale={0.05} position={[0, 1.5, 0]}/>
+      <primitive object={models.buildings.scene} scale={0.05} position={[0, 1.5, 0]}/>
       <primitive
         object={models.model.scene}
         scale={0.05}
+        position={[0, 1.5, 0]}
         onClick={handleModelClick}
         onPointerOver={handleModelPointerOver}
         onPointerOut={handleModelPointerOut}

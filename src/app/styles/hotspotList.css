@@ -47,7 +47,7 @@
 .hotspot-item--publication:hover,
 .hotspot-item--publication.selected { border-left-color: #ff4d4d; }
 
-/* ── Thumbnail ─────────────────────────────────────────────────────────────── */
+/* Thumbnail */
 
 .hotspot-thumb {
   flex-shrink: 0;
@@ -63,7 +63,7 @@
   background: rgba(0, 0, 0, 0.06);
 }
 
-/* ── Text block ────────────────────────────────────────────────────────────── */
+/* Text block */
 
 .hotspot-meta {
   flex: 1;
@@ -99,7 +99,7 @@
   text-overflow: ellipsis;
 }
 
-/* ── Hover arrow ───────────────────────────────────────────────────────────── */
+/* Hover arrow */
 
 .hotspot-arrow {
   position: absolute;

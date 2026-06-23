@@ -15,7 +15,7 @@ export default function BuildingCard({
   const relatedImages = building.images      ?? [];
   const relatedPubs   = building.publications ?? [];
 
-  // ── Info tab ───────────────────────────────────────────────────────────
+  // Info tab 
   const infoContent = (
     <div>
       {building.description ? (
@@ -26,7 +26,7 @@ export default function BuildingCard({
     </div>
   );
 
-  // ── Gallery tab ────────────────────────────────────────────────────────
+  // Gallery tab 
   const galleryContent = (
     <div>
       {relatedImages.length > 0 ? (
@@ -54,7 +54,7 @@ export default function BuildingCard({
     </div>
   );
 
-  // ── Related tab ────────────────────────────────────────────────────────
+  // Related tab
   const relatedContent = (
     <div>
       {relatedPubs.length > 0 ? (
@@ -85,7 +85,7 @@ export default function BuildingCard({
   const tabs = [
     { key: "info",    label: "Info",    content: infoContent },
     { key: "gallery", label: "Gallery", content: galleryContent },
-    { key: "related", label: "Related", content: relatedContent },
+    // { key: "related", label: "Related", content: relatedContent },
   ];
 
   return (

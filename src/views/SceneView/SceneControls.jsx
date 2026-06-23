@@ -5,7 +5,7 @@ export default function SceneControls() {
     <OrbitControls
       enableDamping
       maxPolarAngle={Math.PI / 2}
-      target={[0, 0, 0]}
+      target={[-5, 1.5, 4]}
     />
   );
 }

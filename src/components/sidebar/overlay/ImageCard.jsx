@@ -15,7 +15,7 @@ export default function ImageCard({
   const relatedBuildings = image.buildings    ?? [];
   const relatedPubs      = image.publications ?? [];
 
-  // ── Info tab ───────────────────────────────────────────────────────────
+  // Info tab 
   const infoContent = (
     <div>
       {image.description ? (
@@ -23,33 +23,10 @@ export default function ImageCard({
       ) : (
         <p style={styles.emptyState}>No additional information yet.</p>
       )}
-    </div>
-  );
-
-  // ── Related tab ────────────────────────────────────────────────────────
-  const relatedContent = (
-    <div>
-      {relatedBuildings.length > 0 && (
-        <div>
-          <h4 style={styles.sectionLabel}>Buildings</h4>
-          <ul style={styles.list}>
-            {relatedBuildings.map((b) => (
-              <li
-                key={b.Id ?? b.id ?? b.title}
-                style={styles.listItem}
-                onMouseEnter={() => onBuildingHover?.(b)}
-                onMouseLeave={() => onBuildingHoverEnd?.()}
-              >
-                {b.title}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {relatedPubs.length > 0 && (
         <div style={relatedBuildings.length > 0 ? styles.secondGroup : undefined}>
-          <h4 style={styles.sectionLabel}>Publications</h4>
+          <h4 style={styles.sectionLabel}>Source</h4>
           <ul style={styles.list}>
             {relatedPubs.map((p) => (
               <li key={p.Id ?? p.id ?? p.title} style={styles.listItem}>
@@ -65,6 +42,30 @@ export default function ImageCard({
                     {" "}↗
                   </a>
                 )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+    </div>
+  );
+
+  // Related tab
+  const relatedContent = (
+    <div>
+      {relatedBuildings.length > 0 && (
+        <div>
+          <h4 style={styles.sectionLabel}>Buildings</h4>
+          <ul style={styles.list}>
+            {relatedBuildings.map((b) => (
+              <li
+                key={b.Id ?? b.id ?? b.title}
+                style={styles.listItem}
+                onMouseEnter={() => onBuildingHover?.(b)}
+                onMouseLeave={() => onBuildingHoverEnd?.()}
+              >
+                {b.title}
               </li>
             ))}
           </ul>

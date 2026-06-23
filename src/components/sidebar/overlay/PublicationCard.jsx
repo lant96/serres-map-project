@@ -14,7 +14,7 @@ export default function PublicationCard({
   const relatedImages    = publication.images    ?? [];
   const relatedBuildings = publication.buildings ?? [];
 
-  // ── Info tab ───────────────────────────────────────────────────────────
+  // Info tab 
   const infoContent = (
     <div>
       {publication.description ? (
@@ -36,7 +36,7 @@ export default function PublicationCard({
     </div>
   );
 
-  // ── Related tab ────────────────────────────────────────────────────────
+  // Related tab 
   const relatedContent = (
     <div>
       {relatedImages.length > 0 && (

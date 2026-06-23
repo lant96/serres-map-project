@@ -29,8 +29,6 @@ export default function MapView() {
   const markers         = useRef(null);
   const buildings       = useRef(null);
 
-  // Cache the buildings GeoJSON so flyToBuildingPolygon can
-  // look up centroids without relying on the private source._data
   const buildingsGeoJSON = useRef(null);
 
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -45,7 +43,7 @@ export default function MapView() {
     hotspotsRef.current = hotspots;
   }, [hotspots]);
 
-  // ── MAP INITIALISATION ────────────────────────────────────────────────────
+  // MAP INITIALISATION
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -53,8 +51,8 @@ export default function MapView() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/light-v11",
-      center: [23.5489, 41.089],
-      zoom: 16,
+      center: [23.5475, 41.0891],
+      zoom: 16.8,
     });
 
     // Fetch and cache buildings GeoJSON for centroid lookups
@@ -124,14 +122,12 @@ export default function MapView() {
     };
   }, []);
 
-  // ── MARKERS REBUILD ───────────────────────────────────────────────────────
-
   useEffect(() => {
     if (!mapLoaded || !markers.current) return;
     markers.current.buildMarkers(hotspots);
   }, [mapLoaded, hotspots]);
 
-  // ── SELECTION HIGHLIGHT + FLY-TO ─────────────────────────────────────────
+  // SELECTION HIGHLIGHT + FLY-TO
 
   useEffect(() => {
     if (!mapLoaded || !markers.current || !buildings.current) return;
@@ -156,10 +152,11 @@ export default function MapView() {
     if (!map.current) return;
 
     if (currentHotspot) {
-      // Image / publication — fly to lat/lng
+      // Image fly to lat/lng
       if (Number.isFinite(currentHotspot.lat) && Number.isFinite(currentHotspot.lng)) {
         map.current.flyTo({
           center: [currentHotspot.lng, currentHotspot.lat],
+          padding: { left: 420, top: 0, right: 0, bottom: 0 },
           zoom:   SELECTED_ZOOM,
           ...FLY_OPTIONS,
         });
@@ -180,10 +177,6 @@ export default function MapView() {
     }
 
   }, [mapLoaded, selectedHotspotId, selectedBuildingId, hotspots]);
-
-  // ── Fly to a building polygon centroid ───────────────────────────────────
-  // Uses the cached GeoJSON (not source._data which is a private API
-  // and only contains the URL string when loaded from a file).
 
   function flyToBuildingPolygon(gisId) {
     if (!map.current || !buildingsGeoJSON.current) return;
@@ -219,7 +212,7 @@ export default function MapView() {
     return [lng, lat];
   }
 
-  // ── HOVER HIGHLIGHT ───────────────────────────────────────────────────────
+  // HOVER HIGHLIGHT 
 
   useEffect(() => {
     if (!mapLoaded || !markers.current || !buildings.current) return;

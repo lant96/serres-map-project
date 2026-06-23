@@ -1,7 +1,15 @@
 const SOURCE_ID = "hotspot-markers";
 const LAYER_ID  = "hotspot-markers-layer";
 
-const CIRCLE_RADIUS = 7;
+const CIRCLE_RADIUS = 0.1;
+
+function zoomRadius(baseRadius) {
+  return [
+    "interpolate", ["exponential", 2], ["zoom"],
+    0,  baseRadius / 256,
+    20, baseRadius * 256,
+  ];
+}
 
 const COLORS = {
   image:       { base: "#ff4d4d", selected: "#b30000" }
@@ -13,7 +21,7 @@ export function createMapMarkers({ map, markersRef, setSelection }) {
   let _relatedIds = new Set();
   let _hoveredId  = null;
 
-  // ── Source + layer setup ──────────────────────────────────────────────────
+  // Source + layer setup 
 
   function _ensureSource() {
     if (!map.getSource(SOURCE_ID)) {
@@ -54,7 +62,7 @@ export function createMapMarkers({ map, markersRef, setSelection }) {
     });
   }
 
-  // ── GeoJSON builder ───────────────────────────────────────────────────────
+  // GeoJSON builder 
 
   function _toGeoJSON(hotspots) {
     const features = hotspots
@@ -84,7 +92,7 @@ export function createMapMarkers({ map, markersRef, setSelection }) {
     return { type: "FeatureCollection", features };
   }
 
-  // ── Paint expression builder ──────────────────────────────────────────────
+  // Paint expression builder
 
   function _applyStyles() {
     if (!map.getLayer(LAYER_ID)) return;
@@ -124,17 +132,17 @@ export function createMapMarkers({ map, markersRef, setSelection }) {
     // circle-radius
     let radiusExpr;
     if (!hasActivity) {
-      radiusExpr = CIRCLE_RADIUS;
+      radiusExpr = zoomRadius(CIRCLE_RADIUS);
     } else {
       const c = [];
-      c.push(["==", ["to-string", ["get", "id"]], selectedIdStr], CIRCLE_RADIUS * 1.5);
+      c.push(["==", ["to-string", ["get", "id"]], selectedIdStr], zoomRadius(CIRCLE_RADIUS * 1.5));
       if (_hoveredId) {
-        c.push(["==", ["to-string", ["get", "id"]], hoveredIdStr], CIRCLE_RADIUS * 1.3);
+        c.push(["==", ["to-string", ["get", "id"]], hoveredIdStr], zoomRadius(CIRCLE_RADIUS * 1.3));
       }
       if (relatedArr.length > 0) {
-        c.push(["in", ["to-string", ["get", "id"]], ["literal", relatedArr]], CIRCLE_RADIUS * 1.15);
+        c.push(["in", ["to-string", ["get", "id"]], ["literal", relatedArr]], zoomRadius(CIRCLE_RADIUS * 1.15));
       }
-      c.push(CIRCLE_RADIUS);
+      c.push(zoomRadius(CIRCLE_RADIUS));
       radiusExpr = ["case", ...c];
     }
 
@@ -143,7 +151,7 @@ export function createMapMarkers({ map, markersRef, setSelection }) {
     map.setPaintProperty(LAYER_ID, "circle-radius",   radiusExpr);
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // Public API
 
   function buildMarkers(hotspots) {
     if (!map) return;

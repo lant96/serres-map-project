@@ -4,6 +4,7 @@ import SceneLighting from "./SceneLighting";
 // import SceneGround from "./SceneGround";
 import SceneControls from "./SceneControls";
 import SceneModels from "./SceneModels";
+import SceneMarkers  from "./SceneMarkers";
 
 export default function SceneView() {
   return (
@@ -11,7 +12,7 @@ export default function SceneView() {
       <Canvas
         shadows
         camera={{
-          position: [-4, 8, 21],
+          position: [2, 12, 24],
           fov: 50,
         }}
       >
@@ -22,6 +23,8 @@ export default function SceneView() {
         {/*<SceneGround /> */}
 
         <SceneModels />
+
+        <SceneMarkers />
 
         <SceneControls />
       </Canvas>
