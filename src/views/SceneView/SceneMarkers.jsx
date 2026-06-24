@@ -6,7 +6,7 @@ import { useAppStore } from "../../state/useAppStore";
 import { getRelatedHotspotIds } from "../../state/selectors";
 
 const BLENDER_SCALE = 0.05;
-const MARKER_RADIUS = 0.15;  // in Three.js world units after scale
+const MARKER_RADIUS = 0.05;
 
 // Four-state colour system — mirrors mapMarkers.js
 const COLORS = {

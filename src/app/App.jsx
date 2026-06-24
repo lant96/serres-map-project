@@ -2,11 +2,12 @@ import { useEffect } from "react";
 
 import { useAppStore } from "../state/useAppStore";
 
-import MapView from "../views/MapView/MapView";
+import MapView   from "../views/MapView/MapView";
 import SceneView from "../views/SceneView/SceneView";
 
-import Sidebar from "../components/sidebar/Sidebar";
+import Sidebar        from "../components/sidebar/Sidebar";
 import HotspotOverlay from "../components/sidebar/overlay/HotspotOverlay";
+import InfoModal      from "../components/ui/InfoModal";
 
 import ViewToggle from "../components/ui/ViewToggle";
 
@@ -20,17 +21,14 @@ import "../app/styles/panel.css";
 
 export default function App() {
   const fetchHotspots   = useAppStore((s) => s.fetchHotspots);
-
   const setBuildings    = useAppStore((s) => s.setBuildings);
   const setImages       = useAppStore((s) => s.setImages);
   const setPublications = useAppStore((s) => s.setPublications);
-
   const setSelection    = useAppStore((s) => s.setSelection);
 
   const selectedHotspotId = useAppStore((s) => s.selectedHotspotId);
-  const hotspots           = useAppStore((s) => s.hotspots);
-
-  const viewMode = useAppStore((s) => s.viewMode);
+  const hotspots          = useAppStore((s) => s.hotspots);
+  const viewMode          = useAppStore((s) => s.viewMode);
 
   useEffect(() => {
     async function loadData() {
@@ -57,15 +55,14 @@ export default function App() {
   return (
     <div style={styles.app}>
 
-      {/* Map/Scene fills the entire viewport, behind everything */}
+      {/* Map/Scene fills the entire viewport */}
       <div style={styles.mainView}>
         <ViewToggle />
         {viewMode === "map" ? <MapView /> : <SceneView />}
       </div>
 
-      {/* Single floating panel — header always on top, content swaps below it */}
+      {/* Floating panel */}
       <div className="floating-panel">
-
         <div className="floating-panel-header">
           <h1 className="floating-panel-title">Serres Historical Map</h1>
           <p className="sidebar-subtitle">
@@ -83,8 +80,9 @@ export default function App() {
             <Sidebar />
           )}
         </div>
-
       </div>
+
+      <InfoModal />
 
     </div>
   );

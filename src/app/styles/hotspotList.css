@@ -13,7 +13,7 @@
 
   overflow: hidden;
 
-  padding: 10px 40px 10px 12px;   /* extra right padding reserves space for arrow */
+  padding: 10px 40px 10px 12px; 
   border-radius: 10px;
   border-left: 3px solid transparent;
   cursor: pointer;
