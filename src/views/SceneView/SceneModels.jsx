@@ -33,23 +33,23 @@ function applyMeshState(mesh, state) {
 
   switch (state) {
     case "selected":
-      m.emissive?.set("#cc5500");
-      m.emissiveIntensity = 0.8;
+      m.emissive?.set("#ff4d4d");
+      m.emissiveIntensity = 0.5;
       m.opacity     = 1;
       m.transparent = false;
       m.depthWrite  = true;
       break;
 
     case "hovered":
-      m.emissive?.set("#06b6d4");
-      m.emissiveIntensity = 0.6;
+      m.emissive?.set("#ff4d4d");
+      m.emissiveIntensity = 0.5;
       m.opacity     = 1;
       m.transparent = false;
       m.depthWrite  = true;
       break;
 
     case "related":
-      m.emissive?.set("#f59e0b");
+      m.emissive?.set("#ff8686");
       m.emissiveIntensity = 0.5;
       m.opacity     = 1;
       m.transparent = false;
@@ -169,6 +169,28 @@ export default function SceneModels() {
 
       prepareMaterials(model.scene);
       meshMapRef.current = buildMeshMap(model.scene);
+
+      model.scene.traverse((c) => {
+        if (!c.isMesh || !c.material) return;
+
+        const edges = new THREE.EdgesGeometry(c.geometry);
+
+        const edgeLines = new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({
+            color: 0xff0000,
+          })
+        );
+
+        c.material.opacity     = 0.8;
+        c.material.transparent = true;
+        c.material.depthWrite  = false;
+        c.userData.origOpacity     = 0.8;
+        c.userData.origTransparent = true;
+        c.userData.origDepthWrite  = false;
+
+        c.add(edgeLines);
+      });
 
       setModels({ terrain, buildings, model });
     });

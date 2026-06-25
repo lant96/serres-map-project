@@ -47,16 +47,7 @@ export async function getHotspots() {
   return hotspots.filter((h) => {
     if (h.type === "building")    return !!h.gis_id || !!h.object_name;
     if (h.type === "publication") return true;
-
-    // Images can appear on the 2D map (lat/lng) or the 3D scene (pos_x/y/z)
-    // or both — pass through if either set of coordinates is valid.
-    if (h.type === "image") {
-      const hasMapCoords   = Number.isFinite(h.lat)   && Number.isFinite(h.lng);
-      const hasSceneCoords = Number.isFinite(h.pos_x) &&
-                             Number.isFinite(h.pos_y) &&
-                             Number.isFinite(h.pos_z);
-      return hasMapCoords || hasSceneCoords;
-    }
+    if (h.type === "image") return true;
 
     return Number.isFinite(h.lat) && Number.isFinite(h.lng);
   });
