@@ -7,14 +7,6 @@ export default function ViewToggle() {
 
   return (
     <div className="view-toggle">
-      <button
-        className={`view-toggle-button ${
-          viewMode === "map" ? "active" : ""
-        }`}
-        onClick={() => setViewMode("map")}
-      >
-        Map
-      </button>
 
       <button
         className={`view-toggle-button ${
@@ -24,6 +16,16 @@ export default function ViewToggle() {
       >
         3D
       </button>
+      
+      <button
+        className={`view-toggle-button ${
+          viewMode === "map" ? "active" : ""
+        }`}
+        onClick={() => setViewMode("map")}
+      >
+        Map
+      </button>
+
     </div>
   );
 }

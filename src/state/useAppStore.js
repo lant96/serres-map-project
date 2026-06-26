@@ -19,7 +19,7 @@ export const useAppStore = create((set, get) => ({
 
   activeFilter: "building",
 
-  viewMode: "map",
+  viewMode: "3d",
 
   // Data Loading
 

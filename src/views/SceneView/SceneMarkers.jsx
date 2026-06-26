@@ -8,42 +8,50 @@ import { getRelatedHotspotIds } from "../../state/selectors";
 const BLENDER_SCALE = 0.05;
 const MARKER_RADIUS = 0.05;
 
-// Four-state colour system — mirrors mapMarkers.js
+// ONLY TWO VISUAL STATES
 const COLORS = {
-  default:  "#ff4d4d",
-  selected: "#b30000",
-  related:  "#f59e0b",
-  hovered:  "#06b6d4",
-  dimmed:   "#ff4d4d",
+  active: "#ff4d4d",
+  inactive: "#9aa0a6", 
 };
 
 const EMISSIVE = {
-  selected: { color: "#b30000", intensity: 0.6 },
-  hovered:  { color: "#06b6d4", intensity: 0.5 },
-  related:  { color: "#f59e0b", intensity: 0.4 },
-  default:  { color: "#000000", intensity: 0 },
-  dimmed:   { color: "#000000", intensity: 0 },
+  active: { color: "#ff4d4d", intensity: 0.35 },
+  inactive: { color: "#000000", intensity: 0 },
 };
 
+// STATE RESOLUTION
 function resolveState(hotspotId, selectedId, relatedIds, hoveredId) {
   const id = String(hotspotId);
-  if (id === String(selectedId)) return "selected";
-  if (id === String(hoveredId))  return "hovered";
-  if (relatedIds.has(id))        return "related";
-  if (selectedId || relatedIds.size > 0 || hoveredId) return "dimmed";
-  return "default";
+
+  const hasInteraction =
+    selectedId || hoveredId || relatedIds.size > 0;
+
+  if (!hasInteraction) return "active";
+
+  if (
+    id === String(selectedId) ||
+    id === String(hoveredId) ||
+    relatedIds.has(id)
+  ) {
+    return "active";
+  }
+
+  return "inactive";
 }
 
-// Individual sphere marker
-
+// MARKER
 function ImageMarker({ hotspot, state, onSelect }) {
-  const color   = COLORS[state]   ?? COLORS.default;
-  const em      = EMISSIVE[state] ?? EMISSIVE.default;
-  const opacity = state === "dimmed" ? 0.15 : 1;
-  const scale   =
-    state === "selected" ? 1.5 :
-    state === "hovered"  ? 1.3 :
-    state === "related"  ? 1.15 : 1;
+  const isInactive = state === "inactive";
+
+  const color = isInactive ? COLORS.inactive : COLORS.active;
+  const em = isInactive ? EMISSIVE.inactive : EMISSIVE.active;
+
+  const opacity = isInactive ? 0.2 : 1;
+
+  const scale =
+    state === "active"
+      ? 1
+      : 1;
 
   const position = [
     hotspot.pos_x * BLENDER_SCALE,
@@ -68,6 +76,7 @@ function ImageMarker({ hotspot, state, onSelect }) {
       }}
     >
       <sphereGeometry args={[MARKER_RADIUS, 16, 16]} />
+
       <meshStandardMaterial
         color={color}
         transparent={opacity < 1}
@@ -82,19 +91,19 @@ function ImageMarker({ hotspot, state, onSelect }) {
   );
 }
 
-
+// SCENE MARKERS
 export default function SceneMarkers() {
-  const hotspots                = useAppStore((s) => s.hotspots);
-  const selectedHotspotId       = useAppStore((s) => s.selectedHotspotId);
+  const hotspots = useAppStore((s) => s.hotspots);
+  const selectedHotspotId = useAppStore((s) => s.selectedHotspotId);
   const hoveredRelatedHotspotId = useAppStore((s) => s.hoveredRelatedHotspotId);
-  const setSelection            = useAppStore((s) => s.setSelection);
+  const setSelection = useAppStore((s) => s.setSelection);
 
   const selectedHotspot = hotspots.find(
     (h) => String(h.id) === String(selectedHotspotId)
   );
+
   const relatedIds = getRelatedHotspotIds(selectedHotspot, hotspots);
 
-  // Only render markers for image hotspots that have valid 3D coordinates
   const imageMarkers = hotspots.filter(
     (h) =>
       h.type === "image" &&

@@ -142,7 +142,8 @@ export default function SceneModels() {
       load("/models/oria_oikopedwn.glb"),
       load("/models/buildings-02.glb"),
       load("/models/model.glb"),
-    ]).then(([terrain, buildings, model]) => {
+      load("/models/neo-sxedio.glb"),
+    ]).then(([terrain, buildings, model, neo_sxedio]) => {
       if (!isMounted) return;
 
       prepareMaterials(terrain.scene);
@@ -156,13 +157,25 @@ export default function SceneModels() {
         c.userData.origDepthWrite  = false;
       });
 
+      prepareMaterials(neo_sxedio.scene);
+      neo_sxedio.scene.traverse((c) => {
+        if (!c.isMesh || !c.material) return;
+        c.material.opacity     = 0.3;
+        c.material.transparent = true;
+        c.material.depthWrite  = false;
+        c.userData.origOpacity     = 0.3;
+        c.userData.origTransparent = true;
+        c.userData.origDepthWrite  = false;
+      });
+
+
       prepareMaterials(buildings.scene);
       buildings.scene.traverse((c) => {
         if (!c.isMesh || !c.material) return;
-        c.material.opacity     = 0.4;
+        c.material.opacity     = 0.6;
         c.material.transparent = true;
         c.material.depthWrite  = false;
-        c.userData.origOpacity     = 0.4;
+        c.userData.origOpacity     = 0.6;
         c.userData.origTransparent = true;
         c.userData.origDepthWrite  = false;
       });
@@ -173,12 +186,16 @@ export default function SceneModels() {
       model.scene.traverse((c) => {
         if (!c.isMesh || !c.material) return;
 
+        console.log("Mesh name:", c.name);
+
         const edges = new THREE.EdgesGeometry(c.geometry);
 
         const edgeLines = new THREE.LineSegments(
           edges,
           new THREE.LineBasicMaterial({
             color: 0xff0000,
+            transparent: true,
+            opacity: 0.25,
           })
         );
 
@@ -192,7 +209,7 @@ export default function SceneModels() {
         c.add(edgeLines);
       });
 
-      setModels({ terrain, buildings, model });
+      setModels({ terrain, buildings, model, neo_sxedio });
     });
 
     return () => { isMounted = false; };
@@ -237,8 +254,9 @@ export default function SceneModels() {
 
   return (
     <>
-      <primitive object={models.terrain.scene}   scale={0.05} position={[0, 1.5, 0]}/>
-      <primitive object={models.buildings.scene} scale={0.05} position={[0, 1.5, 0]}/>
+      <primitive object={models.terrain.scene}   scale={0.05} position={[0, 1.5, 0]} />
+      <primitive object={models.buildings.scene} scale={0.05} position={[0, 1.5, 0]} />
+      <primitive object={models.neo_sxedio.scene} scale={0.05} position={[0, 1.5, 0]} />
       <primitive
         object={models.model.scene}
         scale={0.05}
