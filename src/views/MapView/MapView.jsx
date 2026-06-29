@@ -50,7 +50,7 @@ export default function MapView() {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "mapbox://styles/f8-studio/cm02fobrd00a801plglrh61ue",
       center: [23.5475, 41.0891],
       zoom: 16.8,
     });
@@ -68,9 +68,9 @@ export default function MapView() {
       });
       map.current.addLayer({
         id: "serres-blocks-fill",
-        type: "fill",
+        type: "line",
         source: "serres-blocks",
-        paint: { "fill-color": "#e0dccd", "fill-opacity": 0.4 },
+        paint: { "line-color": "#5c5a56", "line-width": 0.5 },
       });
 
       map.current.addSource("buildings", {
@@ -86,13 +86,13 @@ export default function MapView() {
 
       map.current.addSource("market", {
         type: "geojson",
-        data: "/data/ottoman-market.geojson",
+        data: "/data/agora.geojson",
       });
       map.current.addLayer({
         id: "market-outline",
         type: "line",
         source: "market",
-        paint: { "line-color": "#3a3a3a", "line-width": 0.5 },
+        paint: { "line-color": "#5c5a56", "line-width": 0.2 },
       });
 
       const interactions = createMapInteractions({

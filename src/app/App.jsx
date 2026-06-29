@@ -56,7 +56,7 @@ export default function App() {
     <div style={styles.app}>
 
       {/* Map/Scene fills the entire viewport */}
-      <div style={styles.mainView}>
+      <div style={styles.mainView} className="vieport">
         <ViewToggle />
         {viewMode === "map" ? <MapView /> : <SceneView />}
       </div>
@@ -94,6 +94,7 @@ const styles = {
     width: "100vw",
     height: "100vh",
     overflow: "hidden",
+    backgroundColor: "#faf9f6",
   },
 
   mainView: {

@@ -1,0 +1,61 @@
+.layer-toggle {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  z-index: 100;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 6px;
+  background: #F4F3F0;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.layer-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 7px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.layer-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.layer-toggle-btn.active {
+  opacity: 1;
+}
+
+.layer-toggle-btn.hidden {
+  opacity: 0.4;
+}
+
+.layer-toggle-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.layer-toggle-label {
+  font-size: 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+}
+
+.layer-toggle-btn.hidden .layer-toggle-label {
+  color: rgba(0, 0, 0, 0.4);
+}

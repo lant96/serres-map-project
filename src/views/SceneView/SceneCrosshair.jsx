@@ -55,7 +55,7 @@ export default function SceneCrosshair() {
     if (groupRef.current) {
       groupRef.current.position.set(
         posRef.current.x,
-        FLOOR_Y + 0.02,
+        FLOOR_Y,
         posRef.current.z
       );
     }

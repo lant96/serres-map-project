@@ -8,7 +8,7 @@ import { getRelatedHotspotIds } from "../../state/selectors";
 const BLENDER_SCALE = 0.05;
 const MARKER_RADIUS = 0.05;
 
-// ONLY TWO VISUAL STATES
+// only two visual states
 const COLORS = {
   active: "#ff4d4d",
   inactive: "#9aa0a6", 
@@ -19,7 +19,7 @@ const EMISSIVE = {
   inactive: { color: "#000000", intensity: 0 },
 };
 
-// STATE RESOLUTION
+// States
 function resolveState(hotspotId, selectedId, relatedIds, hoveredId) {
   const id = String(hotspotId);
 
@@ -39,9 +39,10 @@ function resolveState(hotspotId, selectedId, relatedIds, hoveredId) {
   return "inactive";
 }
 
-// MARKER
+// Markers
 function ImageMarker({ hotspot, state, onSelect }) {
-  const isInactive = state === "inactive";
+
+    const isInactive = state === "inactive";
 
   const color = isInactive ? COLORS.inactive : COLORS.active;
   const em = isInactive ? EMISSIVE.inactive : EMISSIVE.active;
@@ -55,7 +56,7 @@ function ImageMarker({ hotspot, state, onSelect }) {
 
   const position = [
     hotspot.pos_x * BLENDER_SCALE,
-    hotspot.pos_y * BLENDER_SCALE + 1.5,
+    hotspot.pos_y * BLENDER_SCALE + 1.45,
     hotspot.pos_z * BLENDER_SCALE,
   ];
 
@@ -75,7 +76,8 @@ function ImageMarker({ hotspot, state, onSelect }) {
         document.body.style.cursor = "default";
       }}
     >
-      <sphereGeometry args={[MARKER_RADIUS, 16, 16]} />
+
+      <cylinderGeometry args={[MARKER_RADIUS, MARKER_RADIUS, 0.002, 32]} />
 
       <meshStandardMaterial
         color={color}
@@ -91,7 +93,6 @@ function ImageMarker({ hotspot, state, onSelect }) {
   );
 }
 
-// SCENE MARKERS
 export default function SceneMarkers() {
   const hotspots = useAppStore((s) => s.hotspots);
   const selectedHotspotId = useAppStore((s) => s.selectedHotspotId);

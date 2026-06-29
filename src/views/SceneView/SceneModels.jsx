@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-
 import { useAppStore } from "../../state/useAppStore";
 import { getRelatedHotspotIds } from "../../state/selectors";
 import { gltfLoader } from "./loaders/gltfLoader";
@@ -8,15 +7,12 @@ import { gltfLoader } from "./loaders/gltfLoader";
 function prepareMaterials(scene) {
   scene.traverse((child) => {
     if (!child.isMesh || !child.material) return;
-
     child.material = child.material.clone();
     child.castShadow    = true;
     child.receiveShadow = true;
-
     child.material.roughness  = 1;
     child.material.metalness  = 0;
     child.material.depthWrite = child.material.opacity === 1;
-
     child.userData.origEmissive =
       child.material.emissive?.clone() ?? new THREE.Color(0, 0, 0);
     child.userData.origEmissiveIntensity =
@@ -30,7 +26,6 @@ function prepareMaterials(scene) {
 function applyMeshState(mesh, state) {
   const m = mesh.material;
   if (!m) return;
-
   switch (state) {
     case "selected":
       m.emissive?.set("#ff4d4d");
@@ -39,7 +34,6 @@ function applyMeshState(mesh, state) {
       m.transparent = false;
       m.depthWrite  = true;
       break;
-
     case "hovered":
       m.emissive?.set("#ff4d4d");
       m.emissiveIntensity = 0.5;
@@ -47,7 +41,6 @@ function applyMeshState(mesh, state) {
       m.transparent = false;
       m.depthWrite  = true;
       break;
-
     case "related":
       m.emissive?.set("#ff8686");
       m.emissiveIntensity = 0.5;
@@ -55,7 +48,6 @@ function applyMeshState(mesh, state) {
       m.transparent = false;
       m.depthWrite  = true;
       break;
-
     case "dimmed":
       m.emissive?.set("#000000");
       m.emissiveIntensity = 0;
@@ -63,7 +55,6 @@ function applyMeshState(mesh, state) {
       m.transparent = true;
       m.depthWrite  = false;
       break;
-
     default:
       m.emissive?.copy(
         mesh.userData.origEmissive ?? new THREE.Color(0, 0, 0)
@@ -76,54 +67,39 @@ function applyMeshState(mesh, state) {
   }
 }
 
-
 function buildMeshMap(scene) {
   const map = new Map();
-
   scene.traverse((obj) => {
     if (!obj.isMesh) return;
     const baseName = obj.name.replace(/\.\d+$/, "");
     if (!map.has(baseName)) map.set(baseName, []);
     map.get(baseName).push(obj);
   });
-
   return map;
 }
 
-function applyAllStates({
-  hotspots,
-  selectedHotspotId,
-  relatedIds,
-  hoveredHotspotId,
-  meshMap,
-}) {
+function applyAllStates({ hotspots, selectedHotspotId, relatedIds, hoveredHotspotId, meshMap }) {
   const hasActivity =
     !!selectedHotspotId || relatedIds.size > 0 || !!hoveredHotspotId;
 
   hotspots.forEach((h) => {
     if (!h.object_name) return;
-
     const meshes = meshMap.get(h.object_name) ?? [];
     if (!meshes.length) return;
 
     const id = String(h.id);
     let state = "default";
 
-    if (id === String(selectedHotspotId)) {
-      state = "selected";
-    } else if (id === String(hoveredHotspotId)) {
-      state = "hovered";
-    } else if (relatedIds.has(id)) {
-      state = "related";
-    } else if (hasActivity) {
-      state = "dimmed";
-    }
+    if (id === String(selectedHotspotId))      state = "selected";
+    else if (id === String(hoveredHotspotId))  state = "hovered";
+    else if (relatedIds.has(id))               state = "related";
+    else if (hasActivity)                      state = "dimmed";
 
     meshes.forEach((mesh) => applyMeshState(mesh, state));
   });
 }
 
-export default function SceneModels() {
+export default function SceneModels({ visibility = {} }) {
   const [models, setModels] = useState(null);
   const meshMapRef = useRef(new Map());
 
@@ -143,11 +119,12 @@ export default function SceneModels() {
       load("/models/buildings-02.glb"),
       load("/models/model.glb"),
       load("/models/neo-sxedio.glb"),
-    ]).then(([terrain, buildings, model, neo_sxedio]) => {
+    ]).then(([topografiko, buildings, model, neo_sxedio]) => {
       if (!isMounted) return;
-
-      prepareMaterials(terrain.scene);
-      terrain.scene.traverse((c) => {
+      
+      // Topografiko
+      prepareMaterials(topografiko.scene);
+      topografiko.scene.traverse((c) => {
         if (!c.isMesh || !c.material) return;
         c.material.opacity     = 0.1;
         c.material.transparent = true;
@@ -157,6 +134,7 @@ export default function SceneModels() {
         c.userData.origDepthWrite  = false;
       });
 
+      // Neo sxedio
       prepareMaterials(neo_sxedio.scene);
       neo_sxedio.scene.traverse((c) => {
         if (!c.isMesh || !c.material) return;
@@ -168,7 +146,7 @@ export default function SceneModels() {
         c.userData.origDepthWrite  = false;
       });
 
-
+      // Buildings context
       prepareMaterials(buildings.scene);
       buildings.scene.traverse((c) => {
         if (!c.isMesh || !c.material) return;
@@ -180,16 +158,15 @@ export default function SceneModels() {
         c.userData.origDepthWrite  = false;
       });
 
+      // Hotspot model — mesh map + edge lines
       prepareMaterials(model.scene);
       meshMapRef.current = buildMeshMap(model.scene);
 
       model.scene.traverse((c) => {
         if (!c.isMesh || !c.material) return;
-
         console.log("Mesh name:", c.name);
 
         const edges = new THREE.EdgesGeometry(c.geometry);
-
         const edgeLines = new THREE.LineSegments(
           edges,
           new THREE.LineBasicMaterial({
@@ -209,11 +186,14 @@ export default function SceneModels() {
         c.add(edgeLines);
       });
 
-      setModels({ terrain, buildings, model, neo_sxedio });
+      setModels({topografiko, buildings, model, neo_sxedio });
     });
 
     return () => { isMounted = false; };
   }, []);
+
+
+  // Visual states 
 
   useEffect(() => {
     if (!models || !hotspots.length) return;
@@ -231,6 +211,9 @@ export default function SceneModels() {
       meshMap: meshMapRef.current,
     });
   }, [selectedHotspotId, hoveredRelatedHotspotId, hotspots, models]);
+
+
+// Interaction
 
   function handleModelClick(e) {
     e.stopPropagation();
@@ -254,13 +237,29 @@ export default function SceneModels() {
 
   return (
     <>
-      <primitive object={models.terrain.scene}   scale={0.05} position={[0, 1.5, 0]} />
-      <primitive object={models.buildings.scene} scale={0.05} position={[0, 1.5, 0]} />
-      <primitive object={models.neo_sxedio.scene} scale={0.05} position={[0, 1.5, 0]} />
+      <primitive
+        object={models.topografiko.scene}
+        scale={0.05}
+        position={[0, 1.5, 0]}
+        visible={visibility.topografiko ?? true}
+      />
+      <primitive
+        object={models.buildings.scene}
+        scale={0.05}
+        position={[0, 1.5, 0]}
+        visible={visibility.buildings ?? true}
+      />
+      <primitive
+        object={models.neo_sxedio.scene}
+        scale={0.05}
+        position={[0, 1.5, 0]}
+        visible={visibility.neo_sxedio ?? true}
+      />
       <primitive
         object={models.model.scene}
         scale={0.05}
         position={[0, 1.5, 0]}
+        visible={visibility.model ?? true}
         onClick={handleModelClick}
         onPointerOver={handleModelPointerOver}
         onPointerOut={handleModelPointerOut}

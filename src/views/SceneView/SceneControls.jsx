@@ -22,6 +22,9 @@ export default function SceneControls() {
       enableDamping
       dampingFactor={0.08}
       maxPolarAngle={Math.PI / 2}
+
+      minDistance={4}
+      maxDistance={40}
     />
   );
 }
