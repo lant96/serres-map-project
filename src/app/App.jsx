@@ -8,8 +8,7 @@ import SceneView from "../views/SceneView/SceneView";
 import Sidebar        from "../components/sidebar/Sidebar";
 import HotspotOverlay from "../components/sidebar/overlay/HotspotOverlay";
 import InfoModal      from "../components/ui/InfoModal";
-
-import ViewToggle from "../components/ui/ViewToggle";
+import ControlBar     from "../components/ui/ControlBar";
 
 import { getBuildings }    from "../services/buildingService";
 import { getImages }       from "../services/imageService";
@@ -56,12 +55,16 @@ export default function App() {
     <div style={styles.app}>
 
       {/* Map/Scene fills the entire viewport */}
-      <div style={styles.mainView} className="vieport">
-        <ViewToggle />
+      <div style={styles.mainView}>
         {viewMode === "map" ? <MapView /> : <SceneView />}
       </div>
 
-      {/* Floating panel */}
+      {/* Unified control bar — view toggle + layers, bottom-right */}
+      <div style={styles.bottomRightStack}>
+        <ControlBar />
+      </div>
+
+      {/* Floating panel — header always on top, list or detail below */}
       <div className="floating-panel">
         <div className="floating-panel-header">
           <h1 className="floating-panel-title">Serres Historical Map</h1>
@@ -82,8 +85,6 @@ export default function App() {
         </div>
       </div>
 
-      <InfoModal />
-
     </div>
   );
 }
@@ -103,5 +104,17 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
+  },
+
+  bottomRightStack: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: 12,
+    padding: 30,
+    zIndex: 9999,
   },
 };

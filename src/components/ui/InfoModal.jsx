@@ -186,14 +186,14 @@ export default function InfoModal() {
         </div>
       )}
 
-      {!open && (
+     
         <button
           className="info-reopen"
           onClick={() => setOpen(true)}
         >
           i
         </button>
-      )}
+     
     </>
   );
 }

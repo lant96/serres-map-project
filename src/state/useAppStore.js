@@ -21,6 +21,34 @@ export const useAppStore = create((set, get) => ({
 
   viewMode: "3d",
 
+  // Layer Visibility
+
+  mapVisibility: {
+    "buildings-layer": true,
+    "market-outline": true,
+    "serres-blocks-fill": true,
+    "hotspot-markers-layer": true,
+  },
+ 
+  sceneVisibility: {
+    topografiko: true,
+    buildings: true,
+    model: true,
+    neo_sxedio: true,
+    images: true,
+  },
+ 
+  toggleMapLayer: (key) =>
+    set((s) => ({
+      mapVisibility: { ...s.mapVisibility, [key]: !s.mapVisibility[key] },
+    })),
+ 
+  toggleSceneLayer: (key) =>
+    set((s) => ({
+      sceneVisibility: { ...s.sceneVisibility, [key]: !s.sceneVisibility[key] },
+    })),
+
+
   // Data Loading
 
   fetchHotspots: async () => {

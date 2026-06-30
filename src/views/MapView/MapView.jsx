@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-
 import { useAppStore } from "../../state/useAppStore";
 import { getRelatedHotspotIds } from "../../state/selectors";
-
 import { createMapInteractions } from "./mapInteractions";
 import { createMapMarkers }      from "./mapMarkers";
 import { createMapBuildings }    from "./mapBuildings";
-
 import "../../app/styles/map-controls.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -22,13 +19,12 @@ const FLY_OPTIONS = {
 const SELECTED_ZOOM = 18;
 
 export default function MapView() {
-  const mapContainer    = useRef(null);
-  const map             = useRef(null);
-  const markersRef      = useRef({});
-  const hotspotsRef     = useRef([]);
-  const markers         = useRef(null);
-  const buildings       = useRef(null);
-
+  const mapContainer     = useRef(null);
+  const map              = useRef(null);
+  const markersRef       = useRef({});
+  const hotspotsRef      = useRef([]);
+  const markers          = useRef(null);
+  const buildings        = useRef(null);
   const buildingsGeoJSON = useRef(null);
 
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -39,11 +35,13 @@ export default function MapView() {
   const hoveredRelatedHotspotId = useAppStore((s) => s.hoveredRelatedHotspotId);
   const setSelection            = useAppStore((s) => s.setSelection);
 
+  const mapVisibility = useAppStore((s) => s.mapVisibility);
+
   useEffect(() => {
     hotspotsRef.current = hotspots;
   }, [hotspots]);
 
-  // MAP INITIALISATION
+  // Map Init
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -55,7 +53,6 @@ export default function MapView() {
       zoom: 16.8,
     });
 
-    // Fetch and cache buildings GeoJSON for centroid lookups
     fetch("/data/buildings-merarhias_02.geojson")
       .then((r) => r.json())
       .then((data) => { buildingsGeoJSON.current = data; })
@@ -70,7 +67,7 @@ export default function MapView() {
         id: "serres-blocks-fill",
         type: "line",
         source: "serres-blocks",
-        paint: { "line-color": "#5c5a56", "line-width": 0.5 },
+        paint: { "line-color": "#5c5a56", "line-width": 0.8 },
       });
 
       map.current.addSource("buildings", {
@@ -92,7 +89,7 @@ export default function MapView() {
         id: "market-outline",
         type: "line",
         source: "market",
-        paint: { "line-color": "#5c5a56", "line-width": 0.2 },
+        paint: { "line-color": "#5c5a56", "line-width": 0.3 },
       });
 
       const interactions = createMapInteractions({
@@ -110,6 +107,16 @@ export default function MapView() {
       buildings.current = createMapBuildings({ map: map.current });
 
       setMapLoaded(true);
+
+      Object.entries(mapVisibility).forEach(([layerId, visible]) => {
+        if (map.current.getLayer(layerId)) {
+          map.current.setLayoutProperty(
+            layerId,
+            "visibility",
+            visible ? "visible" : "none"
+          );
+        }
+      });
     });
 
     return () => {
@@ -122,12 +129,30 @@ export default function MapView() {
     };
   }, []);
 
+  // Layer Visibility
+
+  useEffect(() => {
+    if (!mapLoaded || !map.current) return;
+
+    Object.entries(mapVisibility).forEach(([layerId, visible]) => {
+      if (map.current.getLayer(layerId)) {
+        map.current.setLayoutProperty(
+          layerId,
+          "visibility",
+          visible ? "visible" : "none"
+        );
+      }
+    });
+  }, [mapLoaded, mapVisibility]);
+
+  // Markers
+
   useEffect(() => {
     if (!mapLoaded || !markers.current) return;
     markers.current.buildMarkers(hotspots);
   }, [mapLoaded, hotspots]);
 
-  // SELECTION HIGHLIGHT + FLY-TO
+  // Selection Highlight and Fly to
 
   useEffect(() => {
     if (!mapLoaded || !markers.current || !buildings.current) return;
@@ -152,18 +177,16 @@ export default function MapView() {
     if (!map.current) return;
 
     if (currentHotspot) {
-      // Image fly to lat/lng
       if (Number.isFinite(currentHotspot.lat) && Number.isFinite(currentHotspot.lng)) {
         map.current.flyTo({
-          center: [currentHotspot.lng, currentHotspot.lat],
+          center:  [currentHotspot.lng, currentHotspot.lat],
           padding: { left: 420, top: 0, right: 0, bottom: 0 },
-          zoom:   SELECTED_ZOOM,
+          zoom:    SELECTED_ZOOM,
           ...FLY_OPTIONS,
         });
         return;
       }
 
-      // Building hotspot — fly to polygon centroid
       const gisId = activeGisId || currentHotspot.gis_id;
       if (gisId) {
         flyToBuildingPolygon(gisId);
@@ -171,7 +194,6 @@ export default function MapView() {
       }
     }
 
-    // Building selected directly via polygon click
     if (selectedBuildingId) {
       flyToBuildingPolygon(selectedBuildingId);
     }
@@ -180,15 +202,12 @@ export default function MapView() {
 
   function flyToBuildingPolygon(gisId) {
     if (!map.current || !buildingsGeoJSON.current) return;
-
     const feature = buildingsGeoJSON.current.features?.find(
       (f) => f.properties?.gis_id === gisId
     );
     if (!feature) return;
-
     const centroid = getPolygonCentroid(feature.geometry);
     if (!centroid) return;
-
     map.current.flyTo({
       center: centroid,
       zoom:   SELECTED_ZOOM,
@@ -198,7 +217,6 @@ export default function MapView() {
 
   function getPolygonCentroid(geometry) {
     if (!geometry) return null;
-
     let coords = [];
     if (geometry.type === "Polygon") {
       coords = geometry.coordinates[0];
@@ -206,13 +224,12 @@ export default function MapView() {
       coords = geometry.coordinates[0][0];
     }
     if (!coords.length) return null;
-
     const lng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
     const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
     return [lng, lat];
   }
 
-  // HOVER HIGHLIGHT 
+// Hover Highlight
 
   useEffect(() => {
     if (!mapLoaded || !markers.current || !buildings.current) return;

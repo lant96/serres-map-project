@@ -93,7 +93,7 @@ function ImageMarker({ hotspot, state, onSelect }) {
   );
 }
 
-export default function SceneMarkers() {
+export default function SceneMarkers({ visible = true }) {
   const hotspots = useAppStore((s) => s.hotspots);
   const selectedHotspotId = useAppStore((s) => s.selectedHotspotId);
   const hoveredRelatedHotspotId = useAppStore((s) => s.hoveredRelatedHotspotId);
@@ -115,19 +115,21 @@ export default function SceneMarkers() {
 
   return (
     <>
-      {imageMarkers.map((h) => (
-        <ImageMarker
-          key={h.id}
-          hotspot={h}
-          state={resolveState(
-            h.id,
-            selectedHotspotId,
-            relatedIds,
-            hoveredRelatedHotspotId
-          )}
-          onSelect={(id) => setSelection("hotspot", id)}
-        />
-      ))}
+      <group visible={visible}>
+        {imageMarkers.map((h) => (
+            <ImageMarker
+              key={h.id}
+              hotspot={h}
+              state={resolveState(
+                h.id,
+                selectedHotspotId,
+                relatedIds,
+                hoveredRelatedHotspotId
+              )}
+              onSelect={(id) => setSelection("hotspot", id)}
+            />
+        ))}
+      </group>
     </>
   );
 }
