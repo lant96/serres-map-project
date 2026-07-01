@@ -59,10 +59,12 @@ export default function HotspotOverlay({ hotspot, onClose }) {
 
   function onImageClick(img) {
     const h = findHotspotForImage(img);
+    if (h) {setSelectedHotspotId(h.id);}
+  }
 
-    if (h) {
-      setSelectedHotspotId(h.id);
-    }
+  function onBuildingClick(b) {
+    const h = findHotspotForBuilding(b);
+    if (h) {setSelectedHotspotId(h.id);}
   }
 
   return (
@@ -82,6 +84,7 @@ export default function HotspotOverlay({ hotspot, onClose }) {
           image={imageEntity}
           onBuildingHover={onBuildingHover}
           onBuildingHoverEnd={onHoverEnd}
+          onBuildingClick={onBuildingClick}
           onClose={onClose}
         />
       )}

@@ -29,10 +29,10 @@ const LayersIcon = () => (
 );
 
 const MAP_LAYERS = [
-  { key: "buildings-layer",       label: "buildings-layer"       },
-  { key: "market-outline",        label: "market-outline"        },
-  { key: "serres-blocks-fill",    label: "serres-blocks-fill"    },
-  { key: "hotspot-markers-layer", label: "hotspot-markers-layer" },
+  { key: "buildings-layer",       label: "Τοπογραφικός χάρτης 1925"       },
+  { key: "market-outline",        label: "Αγορά"        },
+  { key: "serres-blocks-fill",    label: "Κτίρια μελέτης"    },
+  { key: "hotspot-markers-layer", label: "Φωτογραφίες" },
 ];
 
 const SCENE_LAYERS = [
@@ -40,7 +40,7 @@ const SCENE_LAYERS = [
   { key: "buildings",  label: "Επιπλέον κτίρια"              },
   { key: "model",      label: "Κτίρια μελέτης"               },
   { key: "neo_sxedio", label: "Νέα χάραξη"                   },
-  { key: "images",     label: "Images"                        },
+  { key: "images",     label: "Φωτογραφίες"                        },
 ];
 
 export default function ControlBar() {

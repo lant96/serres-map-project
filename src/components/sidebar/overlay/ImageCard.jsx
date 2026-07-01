@@ -7,9 +7,9 @@ export default function ImageCard({
   image,
   onBuildingHover,
   onBuildingHoverEnd,
+  onBuildingClick,
   onClose,
 }) {
-  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const imgUrl           = image.image_file?.[0]?.url ?? null;
   const relatedBuildings = image.buildings    ?? [];
@@ -47,7 +47,6 @@ export default function ImageCard({
           </ul>
         </div>
       )}
-
     </div>
   );
 
@@ -64,6 +63,7 @@ export default function ImageCard({
                 style={styles.listItem}
                 onMouseEnter={() => onBuildingHover?.(b)}
                 onMouseLeave={() => onBuildingHoverEnd?.()}
+                onClick={() => onBuildingClick?.(b)}
               >
                 {b.title}
               </li>
@@ -85,7 +85,7 @@ export default function ImageCard({
 
   return (
     <div>
-      {/* Hero — archival photo, clickable for lightbox, back arrow floats on top */}
+
       <div className="hotspot-hero-wrapper">
         <BackArrow onClose={onClose} />
         {imgUrl ? (
@@ -93,7 +93,6 @@ export default function ImageCard({
             src={imgUrl}
             alt={image.title ?? ""}
             className="hotspot-hero-image"
-            onClick={() => setLightboxOpen(true)}
           />
         ) : (
           <div className="hotspot-hero-placeholder">No image available</div>
@@ -110,22 +109,6 @@ export default function ImageCard({
         <Tabs tabs={tabs} accentColor="#ff4d4d" />
       </div>
 
-      {lightboxOpen && imgUrl && (
-        <div style={styles.lightboxBackdrop} onClick={() => setLightboxOpen(false)}>
-          <button
-            style={styles.lightboxClose}
-            onClick={() => setLightboxOpen(false)}
-            aria-label="Close"
-          >
-            ×
-          </button>
-          <img
-            src={imgUrl}
-            style={styles.lightboxImage}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
     </div>
   );
 }
@@ -164,6 +147,7 @@ const styles = {
     padding: "6px 8px",
     borderBottom: "1px solid #f0f0f0",
     borderRadius: 4,
+    cursor: "pointer",
     transition: "background 0.15s ease",
   },
   listItemMeta: {
@@ -173,35 +157,5 @@ const styles = {
     color: "#888",
     textDecoration: "none",
     fontSize: 12,
-  },
-  lightboxBackdrop: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.85)",
-    zIndex: 99999,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "zoom-out",
-  },
-  lightboxImage: {
-    maxWidth: "90vw",
-    maxHeight: "90vh",
-    objectFit: "contain",
-    borderRadius: 6,
-    cursor: "default",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-  },
-  lightboxClose: {
-    position: "absolute",
-    top: 20,
-    right: 24,
-    background: "transparent",
-    border: "none",
-    color: "#fff",
-    fontSize: 36,
-    cursor: "pointer",
-    lineHeight: 1,
-    padding: 0,
   },
 };

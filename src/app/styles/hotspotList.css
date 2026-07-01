@@ -51,8 +51,8 @@
 
 .hotspot-thumb {
   flex-shrink: 0;
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
   border-radius: 6px;
   object-fit: cover;
   display: block;
@@ -72,6 +72,7 @@
   flex-direction: column;
   gap: 2px;
   overflow: hidden;
+  padding: 20px;
 }
 
 .hotspot-title {

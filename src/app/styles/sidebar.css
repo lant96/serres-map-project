@@ -26,3 +26,22 @@
 .sidebar-scroll::-webkit-scrollbar {
   width: 0px;
 }
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  animation: slideInFromLeft 0.22s ease;
+}

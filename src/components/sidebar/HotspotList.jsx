@@ -17,7 +17,7 @@ function ItemMeta({ hotspot }) {
 
   if (type === "building") {
     const b           = hotspot.buildings?.[0];
-    title             = b?.title             ?? hotspot.title;
+    //title             = b?.title             ?? hotspot.title;
     short_description = b?.short_description ?? null;
   } else if (type === "image") {
     const img         = hotspot.images?.[0];
