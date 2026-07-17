@@ -1,123 +1,145 @@
 # Serres Historical Spatial Exploration Platform
 
-An interactive web platform for exploring the historical urban fabric of Serres, Greece — focusing on the Ottoman-era and early 20th-century built environment of the city centre.
-
-🔗 **Live demo:** [serres-map-project.vercel.app](https://serres-map-project.vercel.app)
-🏢 **Developed by:** [F/8 Studio](https://f8studio.gr)
+The Serres Historical Spatial Exploration Platform is an interactive web application for exploring the historical urban landscape of Serres, Greece, through geospatial visualisation, archival material, and three-dimensional reconstruction.
 
 ---
 
 ## Overview
 
-The platform combines archival research, architectural reconstruction, and spatial data to create a layered exploration experience. Users can navigate through historical buildings, archival photographs, and scholarly publications, all anchored to their geographic and architectural context.
+This project combines historical research, spatial data, and interactive visualisation to reconstruct parts of the Ottoman and early twentieth-century urban fabric of Serres.
+
+The platform integrates archival photographs, reconstructed building footprints, scholarly publications, and three-dimensional models into a unified exploration environment. Users can investigate historical locations through both an interactive map and a synchronised 3D scene.
+
+Developed in collaboration with **F/8 Studio**, the project demonstrates how modern web technologies can support digital heritage research and public engagement with historical urban environments.
+
+**Live Demo**
+
+https://serres-map-project.vercel.app/
 
 ---
 
 ## Features
 
-### Two view modes
-- **Map view** — 2D interactive map (Mapbox GL JS) with reconstructed building footprints and geolocated image/publication markers
-- **3D view** — Three.js scene with architectural 3D models of reconstructed buildings, navigable with orbit controls
+### Interactive Map
 
-### Hotspot system
-Each point of interest is a *hotspot* — a spatial node connecting a location on the map or a mesh in the 3D scene to one or more content entities:
-- **Buildings** — reconstructed floor plans, descriptions, and related archival images
-- **Images** — archival photographs with year, description, and associated buildings
-- **Publications** — scholarly sources with year and external links
+- Reconstructed historical building footprints
+- Geolocated archival photographs
+- Publication markers
+- Interactive filtering and selection
 
-### Relational highlighting
-Selecting a hotspot automatically highlights all spatially related hotspots — on both the map (polygon/marker opacity) and the 3D scene (emissive material glow). Hovering over related items in the detail panel highlights their counterparts on the map or in the scene in real time.
+### Three-Dimensional Exploration
 
-### Detail overlay
-Clicking any hotspot opens a detail panel showing the full content of the selected entity, including image galleries with lightbox, related building lists, and source links for publications.
+- Reconstructed architectural models
+- Orbit camera controls
+- Synchronised interaction with the map view
 
----
+### Relational Navigation
 
-## Tech stack
+Each hotspot connects multiple types of historical information.
 
-| Layer | Technology |
-|---|---|
-| Frontend framework | React 18 + Vite |
-| State management | Zustand |
-| Map | Mapbox GL JS |
-| 3D scene | Three.js via React Three Fiber |
-| 3D model compression | Draco (GLTF) |
-| Backend / CMS | NocoDB (hosted) |
-| Deployment | Vercel |
+- Buildings
+- Archival images
+- Scholarly publications
 
----
+Selecting an item automatically highlights all related entities across both visualisation modes.
 
-## Data sources
+### Detail Panel
 
-Spatial data, archival images, and bibliographic records are managed in a NocoDB instance. The platform fetches content at runtime via the NocoDB API v3.
+Each hotspot provides:
 
-Content tables:
-- **Hotspots** — spatial nodes linking locations to content entities
-- **Buildings** — reconstructed building records with floor plans
-- **Images** — archival photographs with metadata
-- **Publications** — scholarly and archival sources
+- Historical descriptions
+- Image galleries
+- Related buildings
+- Bibliographic references
+- External publication links
 
 ---
 
-## Project structure
+## Project Structure
 
 ```
 src/
-├── app/                    # Root component and global styles
+├── app/
 ├── components/
-│   ├── controls/           # Map controls
-│   ├── sidebar/            # Hotspot list, filter bar, detail overlay and cards
-│   └── ui/                 # View toggle
-├── services/               # NocoDB API client and entity services
-├── state/                  # Zustand store and selectors
+├── services/
+├── state/
 └── views/
-    ├── MapView/            # Mapbox map, markers, building polygons
-    └── SceneView/          # Three.js scene, models, lighting, controls
+    ├── MapView/
+    └── SceneView/
 
 public/
-├── data/                   # GeoJSON layers (building footprints, market outline)
-├── models/                 # GLB 3D models
-└── draco/                  # Draco decoder for compressed GLTF
+├── data/
+├── models/
+└── draco/
 ```
 
 ---
 
-## Local development
+## Tech Stack
+
+- React
+- Vite
+- Mapbox GL JS
+- Three.js
+- React Three Fiber
+- Zustand
+- NocoDB
+- Vercel
+
+---
+
+## Getting Started
 
 ```bash
 npm install
+
 npm run dev
 ```
 
 ---
 
-## Research context
+## Research Context
 
-This platform was developed as part of original research conducted by F/8 Studio
-into the historical urban landscape of Serres during the Ottoman and early
-post-Ottoman period. The reconstructed building footprints and 3D models are
-based on archival maps, photographs, and published scholarship.
+The platform forms part of ongoing historical research conducted by **F/8 Studio** into the urban development of Serres during the Ottoman and early post-Ottoman period.
 
-The research was presented as *Digital Reconstruction of Lost Urban Heritage –
-Serres, Greece* at the 1st National Conference of Architects in Serres, Greece
-(November 2025). [Conference website](https://architectureserres.gr/)
+Historical reconstructions are based on archival maps, photographs, and published scholarship.
+
+The project was presented at the **1st National Conference of Architects in Serres (2025)** under the title:
+
+*Digital Reconstruction of Lost Urban Heritage – Serres, Greece.*
 
 ---
 
-## Status
+## Current Status
 
-Active development. Content is being progressively added as research continues.
+The platform is under active development, with historical content and reconstructed buildings being progressively expanded as research continues.
+
+---
+
+## Future Work
+
+- Expand the reconstructed building collection.
+- Improve spatial querying and filtering.
+- Introduce temporal navigation between historical periods.
+- Support additional archival collections.
+- Extend the platform with richer historical storytelling tools.
 
 ---
 
 ## Rights
 
-© 2026 F/8 Studio. All rights reserved.
+© 2026 F/8 Studio.
 
-The platform code, 3D reconstructions, and original research content are the 
-property of [F/8 Studio](https://f8studio.gr).
+The source code, historical reconstructions, and original research content are the intellectual property of F/8 Studio.
 
-Archival images reproduced in this platform are sourced from the publications 
-listed within. All third-party content remains the property of its respective 
-rights holders and is used here solely for non-commercial research and 
-documentation purposes.
+Archival material remains the property of its respective rights holders and is included solely for research and documentation purposes.
+
+---
+
+## Author
+
+Athanasia Lantouri
+
+Applied Machine Learning | Human-Centered AI | Interactive Systems
+
+GitHub: https://github.com/lant96
