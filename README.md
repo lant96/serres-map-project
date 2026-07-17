@@ -140,6 +140,6 @@ Archival material remains the property of its respective rights holders and is i
 
 Athanasia Lantouri
 
-Applied Machine Learning | Human-Centered AI | Interactive Systems
+Applied Machine Learning · Human-Centered AI · Interactive Systems · Data Visualisation
 
 GitHub: https://github.com/lant96
