@@ -1,13 +1,16 @@
 const SOURCE_ID = "hotspot-markers";
 const LAYER_ID  = "hotspot-markers-layer";
 
-const CIRCLE_RADIUS = 0.1;
+const CIRCLE_RADIUS = 1;
 
-function zoomRadius(baseRadius) {
+function zoomRadius(multiplier = 1) {
   return [
-    "interpolate", ["exponential", 2], ["zoom"],
-    0,  baseRadius / 256,
-    20, baseRadius * 256,
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    12, 0.2 * multiplier,
+    16, 2 * multiplier,
+    19, 8 * multiplier,
   ];
 }
 

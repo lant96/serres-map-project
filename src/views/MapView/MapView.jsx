@@ -51,6 +51,8 @@ export default function MapView() {
       style: "mapbox://styles/f8-studio/cm02fobrd00a801plglrh61ue",
       center: [23.5475, 41.0891],
       zoom: 16.8,
+      minZoom: 12,
+      maxZoom: 19,
     });
 
     fetch("/data/buildings-merarhias_02.geojson")
@@ -59,6 +61,7 @@ export default function MapView() {
       .catch((err) => console.warn("Could not load buildings GeoJSON:", err));
 
     map.current.on("load", () => {
+
       map.current.addSource("serres-blocks", {
         type: "geojson",
         data: "/data/serres-blocks.geojson",

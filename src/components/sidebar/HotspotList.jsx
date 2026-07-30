@@ -66,12 +66,19 @@ const TYPE_COLORS = {
 
 export default function HotspotList() {
   const hotspots                   = useAppStore((s) => s.hotspots);
+  
   const activeFilter               = useAppStore((s) => s.activeFilter);
   const selectedHotspotId          = useAppStore((s) => s.selectedHotspotId);
   const setSelection               = useAppStore((s) => s.setSelection);
   const setHoveredRelatedHotspotId = useAppStore((s) => s.setHoveredRelatedHotspotId);
 
-  const filtered = hotspots.filter((h) => h.type === activeFilter);
+  const filtered = hotspots.filter((h) => {
+    if (h.type !== activeFilter) return false;
+    if (h.type === "image") {
+      return (h.images?.[0]?.publications?.length ?? 0) > 0;
+    }
+    return true;
+  });
 
   if (!filtered.length) {
     return <p style={styles.empty}>No {activeFilter}s found.</p>;

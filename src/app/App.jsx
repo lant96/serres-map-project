@@ -37,6 +37,10 @@ export default function App() {
         () => getPublications(),
       ]);
 
+      console.log("📦 BUILDINGS LOADED:", buildingData?.length ?? 0);
+      console.log("🖼️ IMAGES LOADED:", imageData?.length ?? 0);
+      console.log("📚 PUBLICATIONS LOADED:", publicationData?.length ?? 0);
+      
       setBuildings(buildingData);
       setImages(imageData);
       setPublications(publicationData);

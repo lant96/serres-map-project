@@ -11,17 +11,32 @@
 .hotspot-hero-wrapper {
   position: relative;
   width: 100%;
-  height: 300px;
-  background: #e2e2e2;
+  height: 320px;
   overflow: hidden;
+  display: inline-flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hotspot-hero-blur {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(16px) brightness(0.85);
+  transform: scale(1.1);
+  z-index: 0;
 }
 
 .hotspot-hero-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
   display: block;
-  background: #fff;
+  z-index: 1;
+  position: absolute;
 }
 
 .hotspot-hero-image-building {

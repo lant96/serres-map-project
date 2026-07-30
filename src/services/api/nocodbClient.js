@@ -48,29 +48,30 @@ async function fetchPage(baseUrl, offset, { retries = 4, baseDelay = 800 } = {})
 async function fetchAll(tableKey) {
   const baseUrl = URLS[tableKey];
 
-  if (!baseUrl) {
-    throw new Error(
-      `nocodbClient: no URL configured for "${tableKey}". ` +
-      `Add VITE_NOCODB_${tableKey.toUpperCase()}_URL to your .env file.`
-    );
-  }
-
-  let offset  = 0;
+  let offset = 0;
   let allRecords = [];
 
   while (true) {
-    const data    = await fetchPage(baseUrl, offset);
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    const url = `${baseUrl}${separator}limit=${PAGE_SIZE}&offset=${offset}`;
+
+    const res = await fetch(url, {
+      headers: { "xc-token": API_TOKEN },
+    });
+
+    if (!res.ok) {
+      console.warn("NocoDB error:", res.status);
+      break;
+    }
+
+    const data = await res.json();
     const records = data.records ?? data.list ?? [];
-    const total   = data.pageInfo?.totalRows ?? data.totalRows ?? null;
 
     allRecords = allRecords.concat(records);
 
     if (records.length < PAGE_SIZE) break;
-    if (total !== null && allRecords.length >= total) break;
 
     offset += PAGE_SIZE;
-
-    await sleep(200);
   }
 
   return { records: allRecords };

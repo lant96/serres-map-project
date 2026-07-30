@@ -88,6 +88,7 @@ export default function ImageCard({
 
       <div className="hotspot-hero-wrapper">
         <BackArrow onClose={onClose} />
+
         {imgUrl ? (
           <img
             src={imgUrl}
@@ -97,6 +98,14 @@ export default function ImageCard({
         ) : (
           <div className="hotspot-hero-placeholder">No image available</div>
         )}
+
+        {imgUrl && (
+          <div
+            className="hotspot-hero-blur"
+            style={{ backgroundImage: `url(${imgUrl})` }}
+          />
+        )}
+
       </div>
 
       <div className="hotspot-body">
