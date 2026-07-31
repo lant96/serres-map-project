@@ -10,7 +10,7 @@ This project combines historical research, spatial data, and interactive visuali
 
 The platform integrates archival photographs, reconstructed building footprints, scholarly publications, and three-dimensional models into a unified exploration environment. Users can investigate historical locations through both an interactive map and a synchronised 3D scene.
 
-Developed in collaboration with **F/8 Studio**, the project demonstrates how modern web technologies can support digital heritage research and public engagement with historical urban environments.
+The application was developed by Athanasia Lantouri ([@lant96](https://github.com/lant96)) for F/8 Studio as part of the studio's work in digital cultural heritage, demonstrating how modern web technologies can support historical research, spatial storytelling, and public engagement with urban history.
 
 **Live Demo**
 
@@ -134,12 +134,3 @@ The source code, historical reconstructions, and original research content are t
 
 Archival material remains the property of its respective rights holders and is included solely for research and documentation purposes.
 
----
-
-## Author
-
-Athanasia Lantouri
-
-Applied Machine Learning · Human-Centered AI · Interactive Systems · Data Visualisation
-
-GitHub: https://github.com/lant96
