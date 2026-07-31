@@ -21,7 +21,7 @@ https://map.f8studio.gr/
 
 Interactive exploration of the historical urban landscape through geospatial visualisation, archival material, and 3D reconstruction.
 
-![Serres Map Project Demo](docs/demo.gif)
+![Demo](docs/demo.gif)
 
 ---
 
