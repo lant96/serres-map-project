@@ -5,10 +5,10 @@ const TEAM = [
   { name: "Κυριάκος Ρόντσης", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-Kyriakos.jpg" },
   { name: "Αθανασία Λαντούρη", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-Athanasia-1.jpg" },
   { name: "Ελένη Μαργούδη", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-Eleni.jpg" },
-  { name: "Γιώργος Μερτζανίδης", photo: null },
+  { name: "Γιώργος Μερτζανίδης", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-GiorgosM.jpg" },
   { name: "Ηρακλής Τζαρίδης", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-Iraklis_2.jpg" },
   { name: "Αλέξης Χατζόγλου", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-Alex.jpg" },
-  { name: "Γιώργος Βάκαλος", photo: null },
+  { name: "Γιώργος Βάκαλος", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-GiorgosV.jpg" },
   { name: "Yutseng Wu", photo: "https://map.f8studio.gr/Photos/app-nocodb/team/team-YutsengWu_2.jpg" },
 ];
 
