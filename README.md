@@ -134,12 +134,3 @@ The source code, historical reconstructions, and original research content are t
 
 Archival material remains the property of its respective rights holders and is included solely for research and documentation purposes.
 
----
-
-## Author
-
-Athanasia Lantouri
-
-Applied Machine Learning · Human-Centered AI · Interactive Systems · Data Visualisation
-
-GitHub: https://github.com/lant96
