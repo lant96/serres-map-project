@@ -14,9 +14,17 @@ The application was developed by Athanasia Lantouri ([@lant96](https://github.co
 
 **Live Demo**
 
-https://serres-map-project.vercel.app/
+https://map.f8studio.gr/
+
+
+## Preview
+
+Interactive exploration of the historical urban landscape through geospatial visualisation, archival material, and 3D reconstruction.
+
+![Serres Map Project Demo](docs/demo.gif)
 
 ---
+
 
 ## Features
 
@@ -84,7 +92,6 @@ public/
 - React Three Fiber
 - Zustand
 - NocoDB
-- Vercel
 
 ---
 
@@ -106,7 +113,11 @@ Historical reconstructions are based on archival maps, photographs, and publishe
 
 The project was presented at the **1st National Conference of Architects in Serres (2025)** under the title:
 
-*Digital Reconstruction of Lost Urban Heritage – Serres, Greece.*
+*Η οδός Μεραρχίας ως άξονας ιστορικής συνέχειας. Μία ψηφιακή προσέγγιση.*
+
+The publication is available through Academia.edu:
+
+[View publication on Academia.edu](https://www.academia.edu/171051744/%CE%97_%CE%BF%CE%B4%CF%8C%CF%82_%CE%9C%CE%B5%CF%81%CE%B1%CF%81%CF%87%CE%AF%CE%B1%CF%82_%CF%89%CF%82_%CE%AC%CE%BE%CE%BF%CE%BD%CE%B1%CF%82_%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AE%CF%82_%CF%83%CF%85%CE%BD%CE%AD%CF%87%CE%B5%CE%B9%CE%B1%CF%82_%CE%9C%CE%AF%CE%B1_%CF%88%CE%B7%CF%86%CE%B9%CE%B1%CE%BA%CE%AE_%CF%80%CF%81%CE%BF%CF%83%CE%AD%CE%B3%CE%B3%CE%B9%CF%83%CE%B7?source=swp_share)
 
 ---
 
@@ -130,7 +141,7 @@ The platform is under active development, with historical content and reconstruc
 
 © 2026 F/8 Studio.
 
-The source code, historical reconstructions, and original research content are the intellectual property of F/8 Studio.
+The source code, digital reconstructions, and original research content are the intellectual property of F/8 Studio. 
 
-Archival material remains the property of its respective rights holders and is included solely for research and documentation purposes.
+Access to certain assets, including 3D models and archival resources, may be restricted.
 

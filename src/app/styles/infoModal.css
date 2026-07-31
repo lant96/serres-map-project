@@ -109,7 +109,6 @@
 .info-divider {
   height: 1px;
   background: rgba(0, 0, 0, 0.07);
-  margin-bottom: 28px;
   flex-shrink: 0;
 }
 
@@ -176,6 +175,15 @@
 }
 
 .info-studio-link:hover {
+  opacity: 0.55;
+}
+
+.info-conference {
+  color: rgba(0, 0, 0, 0.85);
+  transition: opacity 0.15s ease;
+}
+
+.info-conference:hover {
   opacity: 0.55;
 }
 
